@@ -1,0 +1,18 @@
+{
+  "files": {
+    "main.css": "/ScrabbleReact-Optimized/static/css/main.be5195c0.css",
+    "main.js": "/ScrabbleReact-Optimized/static/js/main.f0e218d5.js",
+    "static/js/373.ab7f831b.chunk.js": "/ScrabbleReact-Optimized/static/js/373.ab7f831b.chunk.js",
+    "static/js/695.82f1ef6e.chunk.js": "/ScrabbleReact-Optimized/static/js/695.82f1ef6e.chunk.js",
+    "static/media/dinodance.gif": "/ScrabbleReact-Optimized/static/media/dinodance.3487c0327e452d2661fa.gif",
+    "static/media/dinosaur-roar.gif": "/ScrabbleReact-Optimized/static/media/dinosaur-roar.fa6288ff30655a5bab82.gif",
+    "static/media/dinoscream.gif": "/ScrabbleReact-Optimized/static/media/dinoscream.9a294e0ee25f0307cc22.gif",
+    "static/media/dinosaur-dance1.gif": "/ScrabbleReact-Optimized/static/media/dinosaur-dance1.bcaacabfada3c09f20aa.gif",
+    "static/media/dancingdino.gif": "/ScrabbleReact-Optimized/static/media/dancingdino.7f374d61508fbfb69bac.gif",
+    "index.html": "/ScrabbleReact-Optimized/index.html"
+  },
+  "entrypoints": [
+    "static/css/main.be5195c0.css",
+    "static/js/main.f0e218d5.js"
+  ]
+}
