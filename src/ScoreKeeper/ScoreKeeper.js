@@ -12,20 +12,33 @@ const gameType = (points) => {
 
 const engLevels = {0: "", 1: "(Weak)", 2: "(Medium)", 3: "(Strong)"}//used to display the level of the AI
 
+const CurrentTurnHeader = ({ currentPlayerName, currentPlayerLevel }) => {
+    return (
+        <div className={styles.currentTurnHeader}>
+            <div className={styles.currentTurnLabel}>Current Turn</div>
+            <div className={styles.currentTurnName}>
+                {currentPlayerName} {engLevels[currentPlayerLevel]}
+            </div>
+        </div>
+    )
+}
+
 const scoreTable = (playersAndPoints, currentPlayer) => {
     return (
         <Table bordered className={styles.mytable}>
             <tbody>
                 {playersAndPoints.map((el, ind) => {
+                    const isCurrentPlayer = ind === currentPlayer
                     return (
                         <tr
                             key={"row" + ind}
                             style={
-                                ind === currentPlayer
-                                    ? { background: "yellow" }
+                                isCurrentPlayer
+                                    ? { background: "#ffe066", fontWeight: "bold" }
                                     : null
                             }>
                             <td>
+                                {isCurrentPlayer && <span className={styles.turnArrow}>► </span>}
                                 <span className={styles.bold}>{`${el.name} ${engLevels[el.level]}`}</span>
                             </td>
                             <td>{el.points}</td>
@@ -151,12 +164,20 @@ const ScoreKeeper = (props) => {
         })
     }
 
+    const currentPlayerData = props.playersAndPoints[props.currentPlayer]
+
     return (
         <div className={`d-flex flex-column`}>
             <div
                 className={`p-1 mb-2 justify-content-center ${styles["pointsOuterBox"]}`}>
                 Points possible:{" "}
                 <span className={styles.bold}>{props.pointsPossible}</span>
+            </div>
+            <div className="p-1 mb-2 justify-content-center">
+                <CurrentTurnHeader
+                    currentPlayerName={currentPlayerData.name}
+                    currentPlayerLevel={currentPlayerData.level}
+                />
             </div>
             <div className="p-1 mb-2 justify-content-center">
                 {scoreTable(props.playersAndPoints, props.currentPlayer)}
