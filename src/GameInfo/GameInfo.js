@@ -1,12 +1,12 @@
 import React, { useState } from "react"
-import { Button, ButtonToolbar } from "react-bootstrap"
+import { Button, ButtonToolbar, Card } from "react-bootstrap"
 import Instructions from "../Instructions/Instructions"
 import { AI_LIST } from "../Utils/Data"
 import { randomUpTo, subtractArrays } from "../Utils/helpers"
 import styles from "./GameInfo.module.css"
 
 
-const GameInfo = ({ handleSubmit }) => {
+const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame }) => {
 
     const [showInstr, setShowInstr] = useState(false)
     const [players, setPlayers] = useState([])
@@ -192,7 +192,27 @@ const GameInfo = ({ handleSubmit }) => {
                     )
                 }
             >
-                {players.length>0 ? 
+                {hasSavedGame && (
+                    <Card className={`${styles.card} ${styles.shadow2} mb-4`}>
+                        <Card.Body>
+                            <Card.Title>Resume Game</Card.Title>
+                            <Card.Text>
+                                You have a saved game with: <strong>{savedPlayerNames}</strong>
+                            </Card.Text>
+                            <Button
+                                variant="success"
+                                onClick={onResumeGame}
+                                className="w-100"
+                            >
+                                Resume Game
+                            </Button>
+                            <div className="text-center mt-2 text-muted">
+                                <small>or start a new game below</small>
+                            </div>
+                        </Card.Body>
+                    </Card>
+                )}
+                {players.length>0 ?
                 <div className={`${styles.card} ${styles.shadow2} col-lg-6 col-sm-12 col-md-12`}>
                     {playerform}
                 </div> : null }

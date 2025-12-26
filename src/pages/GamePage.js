@@ -23,8 +23,15 @@ const GamePage = () => {
     localStorage.removeItem('scrabble-gameState');
     localStorage.removeItem('scrabble-lastPlayed');
     localStorage.removeItem('scrabble-gameIsOver');
+    localStorage.removeItem('scrabble-gameSettings');
 
     // Navigate back to home (no reload!)
+    navigate('/', { replace: true });
+  };
+
+  const saveAndExit = () => {
+    // Don't clear localStorage - game will be saved
+    // Just navigate back to home
     navigate('/', { replace: true });
   };
 
@@ -32,7 +39,7 @@ const GamePage = () => {
     return null; // Will redirect in useEffect
   }
 
-  return <Game gameVariables={gameVariables} exitGame={exitGame} />;
+  return <Game gameVariables={gameVariables} exitGame={exitGame} saveAndExit={saveAndExit} />;
 };
 
 export default GamePage;

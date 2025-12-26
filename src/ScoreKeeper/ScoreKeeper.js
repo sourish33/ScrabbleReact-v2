@@ -85,18 +85,27 @@ const LastPlayed = ({ lastPlayed }) => {
     )
 }
 
-const Buttons = ({ showInstructions, exitGame }) => {
+const Buttons = ({ showInstructions, exitGame, saveAndExit }) => {
     return (
-        <div className={`d-flex flex-row justify-content-center`}>
-            <div className="p-2 mt-0">
-                <Button variant="info" onClick={showInstructions}>
-                    <ButtonContent text={"Instructions"}/>
-                </Button>
+        <div className={`d-flex flex-column`}>
+            <div className={`d-flex flex-row justify-content-center`}>
+                <div className="p-2 mt-0">
+                    <Button variant="info" onClick={showInstructions}>
+                        <ButtonContent text={"Instructions"}/>
+                    </Button>
+                </div>
+                <div className="p-2 mt-0">
+                    <Button variant="danger" onClick={exitGame}>
+                        <ButtonContent text={"Exit"}/>
+                    </Button>
+                </div>
             </div>
-            <div className="p-2 mt-0">
-                <Button variant="danger" onClick={exitGame}>
-                    <ButtonContent text={"Exit"}/>
-                </Button>
+            <div className={`d-flex flex-row justify-content-center`}>
+                <div className="p-2 mt-0">
+                    <Button variant="success" onClick={saveAndExit}>
+                        <ButtonContent text={"Save & Exit"}/>
+                    </Button>
+                </div>
             </div>
         </div>
     )
@@ -110,12 +119,34 @@ const ScoreKeeper = (props) => {
         }
         Swal.fire({
             title: "Are you sure you want to quit?",
+            text: "Your game will not be saved.",
             showCancelButton: true,
             confirmButtonText: "Quit",
+            confirmButtonColor: '#d33',
         }).then((result) => {
             if (result.isConfirmed) {
                 props.exitGame()
             } else {
+            }
+        })
+    }
+
+    const saveAndExitWithConfirmation = () => {
+        if (props.gameIsOver) {
+            props.exitGame()
+            return
+        }
+        Swal.fire({
+            title: "Save game and exit?",
+            text: "You can resume this game later from the main menu.",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Save & Exit",
+            confirmButtonColor: '#28a745',
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                props.saveAndExit()
             }
         })
     }
@@ -144,6 +175,7 @@ const ScoreKeeper = (props) => {
                 <Buttons
                     showInstructions={props.showInstructions}
                     exitGame={exitWithWarning}
+                    saveAndExit={saveAndExitWithConfirmation}
                 />
             </div>
             <div className="p-1 mb-2 justify-content-center">

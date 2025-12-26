@@ -41,7 +41,7 @@ import useLocalStorage from "../hooks/useLocalStorage"
 import useLocalStorageReducer from "../hooks/useLocalStorageReducer"
 
 
-const Game = ({ gameVariables, exitGame }) => {
+const Game = ({ gameVariables, exitGame, saveAndExit }) => {
 
     const initialTilesAndBag = {tiles: [], bag: Bag}
     const [showDict, setShowDict] = useState(false)
@@ -596,6 +596,7 @@ const Game = ({ gameVariables, exitGame }) => {
         localStorage.removeItem('scrabble-gameState');
         localStorage.removeItem('scrabble-lastPlayed');
         localStorage.removeItem('scrabble-gameIsOver');
+        localStorage.removeItem('scrabble-gameSettings');
     }
 
     const play = () => {
@@ -753,6 +754,7 @@ const Game = ({ gameVariables, exitGame }) => {
                             maxPoints={maxPoints}
                             lastPlayed={lastPlayed}
                             exitGame={exitGame}
+                            saveAndExit={saveAndExit}
                             showInstructions = {showInstructions}
                             dictChecking={dictChecking}
                             gameIsOver={gameIsOver}

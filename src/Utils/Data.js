@@ -69,6 +69,7 @@ export const greetings = {
 }
 
 export const AI_LIST = [
+    "AI Parker",
     "AI Lily",
     "AI Kira",
     "AI Jasmine",
