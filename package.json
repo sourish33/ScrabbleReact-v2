@@ -8,6 +8,7 @@
     "react": "^18.0.0",
     "react-bootstrap": "^2.0.0",
     "react-dom": "^18.0.0",
+    "react-router-dom": "^7.11.0",
     "react-scripts": "5.0.0",
     "sweetalert2": "^11.1.0"
   },
@@ -40,4 +41,3 @@
     "gh-pages": "^3.2.3"
   }
 }
-
