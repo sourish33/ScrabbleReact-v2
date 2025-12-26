@@ -35,7 +35,6 @@ import {
     makeAllSlots,
     makeRackPerms,
 } from "./AIHelperFunctions"
-import worker from 'workerize-loader!../Workers/worker'; // eslint-disable-line import/no-webpack-loader-syntax
 import AIThinkingModal from "../AIThinkingModal/AIThinkingModal"
 import Instructions from "../Instructions/Instructions"
 
@@ -380,23 +379,30 @@ const Game = ({ gameVariables, exitGame }) => {
 
     function callWorker(perms, slots, tiles, whichRack, cutoff, toWin, verbose=true) {
         return new Promise((resolve, reject) => {
-            const myWorker = worker()
+            const myWorker = new Worker(new URL('../Workers/worker.js', import.meta.url))
             setAiSays("")
             myWorker.addEventListener('message', (message) => {
-                if (message.data.type!=="RPC"){
-                    let result = message.data
-                    if (typeof(result)==='string'){
-                        setAiSays(message.data)
-                    }
-                    if (Array.isArray(result)){
-                        setNumWorkersDone(x=>x+1)
-                        resolve(result)
-                        myWorker.terminate()
-                    }
+                let result = message.data
+                if (typeof(result)==='string'){
+                    setAiSays(message.data)
                 }
-              })
+                if (Array.isArray(result)){
+                    setNumWorkersDone(x=>x+1)
+                    resolve(result)
+                    myWorker.terminate()
+                }
+            })
 
-            myWorker.crunch(perms, slots, tiles, whichRack, cutoff, toWin, verbose)
+            myWorker.postMessage({
+                type: 'crunch',
+                pp: perms,
+                ss: slots,
+                tiles,
+                whichRack,
+                cutoff,
+                toWin,
+                verbose
+            })
         })
     }
 
