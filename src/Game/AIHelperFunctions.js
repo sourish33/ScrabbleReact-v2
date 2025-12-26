@@ -57,7 +57,7 @@ function getXsAndYs(letterArray) {
     return [xs, ys]
 }
 
-function makeVerSlots(x, n, legalPos, submittedTiles) {
+function makeVerSlots(x, n, legalPosSet, submittedTiles) {
     if (n > 15) {
         throw new Error(`${n} cannot be greater than 15 in makeVerSlots`)
     }
@@ -71,7 +71,8 @@ function makeVerSlots(x, n, legalPos, submittedTiles) {
         if (slot.length === 0 || slot.length === 1 || slot.length > 7) {
             continue
         }
-        if (anyCommonElements(slot, legalPos)) {
+        // Use Set.has() for O(1) lookup instead of anyCommonElements
+        if (slot.some(pos => legalPosSet.has(pos))) {
             arr.push(slot)
         }
     }
@@ -90,9 +91,9 @@ function prioritySort(slotArray) {
     return [...TWslots, ...DWslots, ...TLslots, ...DLslots, ...slotArray]
 }
 
-function makeHorSlots(y, n, legalPos, submittedTiles) {
-    //y is the y-coord and n is the length of a window, legalPos are the legal positions and submittedTiles are the submitted Tiles
-    //returns an array of all possible slots of lengt
+function makeHorSlots(y, n, legalPosSet, submittedTiles) {
+    //y is the y-coord and n is the length of a window, legalPosSet is a Set of legal positions and submittedTiles are the submitted Tiles
+    //returns an array of all possible slots of length n
     if (n > 15) {
         throw new Error(`${n} cannot be greater than 15 in makeHorSlots`)
     }
@@ -106,7 +107,8 @@ function makeHorSlots(y, n, legalPos, submittedTiles) {
         if (slot.length === 0 || slot.length === 1 || slot.length > 7) {
             continue
         }
-        if (anyCommonElements(slot, legalPos)) {
+        // Use Set.has() for O(1) lookup instead of anyCommonElements
+        if (slot.some(pos => legalPosSet.has(pos))) {
             arr.push(slot)
         }
     }
@@ -115,16 +117,17 @@ function makeHorSlots(y, n, legalPos, submittedTiles) {
 
 function makeAllHorSlots(tiles, lp, sub) {
     const arrMap = new Map()
+    const lpSet = new Set(lp)  // Convert to Set once for O(1) lookups
     let [, ys] = getXsAndYs(lp)
     if (ys.length === 0) {
         return []
     }
     for (let y of ys) {
         for (let n = 2; n < 15; n++) {
-            let slots = makeHorSlots(y, n, lp, sub)
+            let slots = makeHorSlots(y, n, lpSet, sub)
             for (let slot of slots) {
                 // Slots are already in order from makeHorSlots, no need to sort
-                let str = JSON.stringify(slot)
+                let str = slot.join(',')  // Faster than JSON.stringify
                 if (!arrMap.has(str)) {
                     arrMap.set(str, slot)
                 }
@@ -136,16 +139,17 @@ function makeAllHorSlots(tiles, lp, sub) {
 
 function makeAllVerSlots(tiles, lp, sub) {
     const arrMap = new Map()
+    const lpSet = new Set(lp)  // Convert to Set once for O(1) lookups
     let [xs] = getXsAndYs(lp)
     if (xs.length === 0) {
         return []
     }
     for (let x of xs) {
         for (let n = 2; n < 15; n++) {
-            let slots = makeVerSlots(x, n, lp, sub)
+            let slots = makeVerSlots(x, n, lpSet, sub)
             for (let slot of slots) {
                 // Slots are already in order from makeVerSlots, no need to sort
-                let str = JSON.stringify(slot)
+                let str = slot.join(',')  // Faster than JSON.stringify
                 if (!arrMap.has(str)) {
                     arrMap.set(str, slot)
                 }
@@ -199,10 +203,17 @@ export function makeRackPerms(tiles, visibleRack) {
     return [p1, p2, p3, p4, p5, p6, p7]
 }
 
-function findBlankTile(rackTiles, tiles) {
+function findBlankTile(rackTiles, tilesMap) {
     //returns index of tile containing blank and -1 if none found
-    let rackLetters = readWord(rackTiles, tiles)
-    return rackLetters.indexOf("_")
+    // Optimized: Check tiles directly instead of reading entire word
+    // Takes pre-computed tilesMap to avoid repeated conversions
+    for (let i = 0; i < rackTiles.length; i++) {
+        const tile = tilesMap.get(rackTiles[i])
+        if (tile && tile[0] === "_") {
+            return i
+        }
+    }
+    return -1
 }
 
 export function evaluateMoveBlank(
@@ -211,18 +222,24 @@ export function evaluateMoveBlank(
     boardPositions,
     tiles,
     visibleRack,
-    letter
+    letter,
+    tilesMap = null
 ) {
     // rackTilesWithBlank: a group of rack tiles containing a blank tile
     // let blankInd = the index of the blank tile
+    // tilesMap: optional pre-computed Map to avoid repeated conversions
 
+    if (!tilesMap) {
+        tilesMap = arrayToMap(tiles)
+    }
     let blankpos = rackTilesWithBlank[blankInd]
-    let tilesMap = arrayToMap(tiles)
     let blankTile = tilesMap.get(blankpos)
+    // Create a copy of the Map to avoid mutating the original
+    let tilesMapCopy = new Map(tilesMap)
     // Create a copy to avoid mutating the original
     let blankTileCopy = [letter, blankTile[1], blankTile[2]]
-    tilesMap.set(blankpos, blankTileCopy)
-    let tilesCopy = mapToArray(tilesMap)
+    tilesMapCopy.set(blankpos, blankTileCopy)
+    let tilesCopy = mapToArray(tilesMapCopy)
 
     return evaluateMove(
         rackTilesWithBlank,
@@ -261,13 +278,16 @@ export const evaluateMoves = (rackPerms, slots, tiles, rack, cutoff = 50000, toW
         return []
     }
 
+    // Pre-compute tilesMap once to avoid repeated array-to-Map conversions
+    const tilesMap = arrayToMap(tiles)
+
     let moves = []
     let tries = 0
     let triesBlank = 0
     let cutoffTriesBlank = 10000
     function search() {//made into a function so that loops can be broken out of using return
         for (let rp of rackPerms) {
-            let blankInd = findBlankTile(rp, tiles)
+            let blankInd = findBlankTile(rp, tilesMap)
             if (blankInd === -1) {
                 for (let s of slots) {
                     if (tries > cutoff) {
@@ -300,7 +320,8 @@ export const evaluateMoves = (rackPerms, slots, tiles, rack, cutoff = 50000, toW
                             s,
                             tiles,
                             rack,
-                            letter
+                            letter,
+                            tilesMap
                         )
                         if (pts) {
                             moves.push({
