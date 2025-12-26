@@ -193,20 +193,41 @@ const Game = ({ gameVariables, exitGame }) => {
             return true
         }
         ///////
+        // Game ends when bag is empty AND at least one player has emptied their rack
         if (bag.length === 0) {
-            //no tiles left
-            let playersAndPointsCopy = Array.from(playersAndPoints)
-            for (let i = 0; i < playersAndPointsCopy.length; i++) {
-                playersAndPointsCopy[i].points -= rackPoints(
-                    playersAndPointsCopy[i].rack,
-                    tiles
-                )
+            // Check if any player has an empty rack
+            let playerWithEmptyRack = -1
+            for (let i = 0; i < playersAndPoints.length; i++) {
+                let rackTiles = tilesOnRack(tiles, playersAndPoints[i].rack)
+                if (rackTiles.length === 0) {
+                    playerWithEmptyRack = i
+                    break
+                }
             }
-            setPlayersAndPoints(playersAndPointsCopy)
-            setShowVictoryBox((x) => true)
-            setButtonsDisabled((x) => true)
-            setGameIsOver(true)
-            return true
+
+            // Only end game if someone has emptied their rack
+            if (playerWithEmptyRack !== -1) {
+                let playersAndPointsCopy = Array.from(playersAndPoints)
+                let totalRemainingPoints = 0
+
+                // Deduct points from players with tiles remaining
+                for (let i = 0; i < playersAndPointsCopy.length; i++) {
+                    if (i !== playerWithEmptyRack) {
+                        let points = rackPoints(playersAndPointsCopy[i].rack, tiles)
+                        playersAndPointsCopy[i].points -= points
+                        totalRemainingPoints += points
+                    }
+                }
+
+                // Award those points to the player who went out
+                playersAndPointsCopy[playerWithEmptyRack].points += totalRemainingPoints
+
+                setPlayersAndPoints(playersAndPointsCopy)
+                setShowVictoryBox((x) => true)
+                setButtonsDisabled((x) => true)
+                setGameIsOver(true)
+                return true
+            }
         }
 
         return false
@@ -356,6 +377,7 @@ const Game = ({ gameVariables, exitGame }) => {
         const [theTiles] = tilesBagArr
         setShowAIThinking(true)
         const { cp: currentPlayer } = gameState
+        // makeRackPerms now handles empty/partial racks gracefully
         let [p1, p2, p3, p4, p5, p6, p7] = makeRackPerms(
             theTiles,
             playersAndPoints[currentPlayer].rack
@@ -364,7 +386,7 @@ const Game = ({ gameVariables, exitGame }) => {
         let [s1, s2, s3, s4, s5, s6, s7] = makeAllSlots(theTiles, makeVerslots)
         callAllWorkers([p1, p2, p3, p4, p5, p6, p7], [s1, s2, s3, s4, s5, s6, s7], theTiles, currentPlayer)
             .then((bestMove)=>aiSubmitMove(bestMove, tilesBagArr, currentPlayer))
-        
+
     }
 
 
@@ -448,8 +470,11 @@ const Game = ({ gameVariables, exitGame }) => {
     const aiSubmitMove = (bestMove, tilesBagArr, currentPlayer) =>{
         setShowAIThinking(false)
         if (bestMove.length===0){
-            console.log("No moves found")
-            passTurn()
+            console.log("No moves found - AI passing turn")
+            // Delay before passing to allow UI update and prevent infinite loop
+            setTimeout(() => {
+                passTurn()
+            }, 1000)
             return
         }
         const [theTiles, theBag] = tilesBagArr

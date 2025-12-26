@@ -178,7 +178,17 @@ export function makeAllSlots(tiles, verSlots = true) {
 
 export function makeRackPerms(tiles, visibleRack) {
     let nums = Array.from({ length: 7 }, (x, i) => i + 1)
-    let rackPos = nums.map((el) => visibleRack + el)
+    let allRackPos = nums.map((el) => visibleRack + el)
+
+    // Filter to only positions that actually have tiles (important at end of game)
+    const tilesMap = arrayToMap(tiles)
+    let rackPos = allRackPos.filter((pos) => tilesMap.has(pos))
+
+    // If no tiles on rack, return empty arrays
+    if (rackPos.length === 0) {
+        return [[], [], [], [], [], [], []]
+    }
+
     let combs = combinations(rackPos)
     let perms = []
     for (let comb of combs) {
