@@ -1,8 +1,9 @@
 {
   "files": {
     "main.css": "/ScrabbleReact-v2/static/css/main.be5195c0.css",
-    "main.js": "/ScrabbleReact-v2/static/js/main.9c4ddd1f.js",
+    "main.js": "/ScrabbleReact-v2/static/js/main.790f5892.js",
     "static/js/373.6c21d11f.chunk.js": "/ScrabbleReact-v2/static/js/373.6c21d11f.chunk.js",
+    "static/js/726.b9efeb6d.chunk.js": "/ScrabbleReact-v2/static/js/726.b9efeb6d.chunk.js",
     "static/js/695.82f1ef6e.chunk.js": "/ScrabbleReact-v2/static/js/695.82f1ef6e.chunk.js",
     "static/media/dinodance.gif": "/ScrabbleReact-v2/static/media/dinodance.3487c0327e452d2661fa.gif",
     "static/media/dinosaur-roar.gif": "/ScrabbleReact-v2/static/media/dinosaur-roar.fa6288ff30655a5bab82.gif",
@@ -13,6 +14,6 @@
   },
   "entrypoints": [
     "static/css/main.be5195c0.css",
-    "static/js/main.9c4ddd1f.js"
+    "static/js/main.790f5892.js"
   ]
 }
