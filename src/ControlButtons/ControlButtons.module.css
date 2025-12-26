@@ -1,0 +1,40 @@
+
+
+
+/* .horz-btns{
+  margin-top:2px;
+} */
+
+.stretch {
+  width:75%
+}
+
+
+@media only screen and (max-width: 767px) {
+
+    .horz-btns{
+        flex-direction: row !important;
+        justify-content: space-around !important;
+      }
+
+    .stretch{
+      width:auto;
+    }
+
+
+
+}
+
+@media only screen and (min-width: 768px) and (max-width: 992px) {
+
+  .horz-btns{
+      flex-direction: row !important;
+      justify-content: space-around !important;
+    }
+
+  .stretch{
+    width:auto;
+  }
+
+
+}

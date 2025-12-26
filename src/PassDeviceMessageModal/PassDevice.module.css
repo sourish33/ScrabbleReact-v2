@@ -1,0 +1,27 @@
+.buttonstyle {
+    margin-left: auto;
+    margin-right: auto;
+    width:50%;
+  }
+
+.centerTop {
+    justify-content: center;
+}
+
+.centerMid {
+    text-align: center;
+}
+
+.tdstyle {
+    font-weight: bold;
+    color:hotpink;
+}
+
+.mytable {
+    background: lightgreen;
+}
+
+.bluebold {
+    font-weight: bold;
+    color: blue
+}

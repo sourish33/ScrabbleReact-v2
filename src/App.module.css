@@ -1,0 +1,10 @@
+.noscrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* Hide scrollbar for IE, Edge and Firefox */
+  .noscrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none; 
+    margin:0 /* Firefox */
+  }

@@ -1,0 +1,11 @@
+.hidden {
+    display: None;
+}
+
+.center {
+    margin-left: auto;
+    margin-right: auto;
+}
+.smalltext{
+    font-size: .8em;
+}

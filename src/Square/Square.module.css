@@ -1,0 +1,72 @@
+.TW {
+    background-color: #ff6b33;
+  }
+  
+  .DL {
+    background-color: #3393ff;
+  }
+  
+  .TL {
+    background-color: #4f9425;
+  }
+  
+  .DW{
+    background-color: red;
+  }
+  
+  .S{
+    background-color: red;
+    color: white;
+  }
+
+  .star{
+    color: white;
+    font-size: 1.5em;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .plain {
+      background-color: rgb(195, 190, 161);
+  }
+
+  .full-height-width {
+      width: 100%;
+      height: 100%;
+      border: 1px solid white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      user-select: none;
+  }
+
+
+  @media only screen and (max-width: 992px) {
+
+    /* @media (max-width: @screen-sm-min) { */
+       
+    .TW {
+      /* padding: 0; */
+      font-size: .8em;
+      
+    }
+    
+    .DL {
+      /* padding: 0; */
+      font-size: .8em;
+    }
+    
+    .TL {
+      font-size: .8em;
+    }
+    
+    .DW{
+      font-size: .8em;
+    }
+    
+    .S{
+      font-size: .8em;
+    }
+
+  }

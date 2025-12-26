@@ -1,0 +1,5 @@
+.noscroll{
+    height: 100vh;
+    overflow: hidden;
+    touch-action: auto;
+}

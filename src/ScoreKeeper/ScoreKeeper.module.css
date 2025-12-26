@@ -1,0 +1,83 @@
+.pointsOuterBox {
+    margin: auto;
+    text-align: center;
+    background-color: lightgreen;
+    width: 80%;
+    border-radius: 5px;
+}
+
+.bold {
+    font-weight: bold;
+}
+
+.tpdiv {
+    width: 80%;
+    background-color: lightpink;
+    border-radius: 5px;
+    margin-left: auto; 
+    margin-right: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+
+.tpbox {
+    text-align: center;
+}
+
+.mytable {
+    border: 2px solid blue;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mytable td,
+th {
+    border: 2px solid blue;
+}
+
+.lastPlayed {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid #666;
+    padding: 5px;
+    border-radius: 10px;
+    background-color:lightskyblue;
+}
+
+.nomargin {
+    margin:0;
+}
+
+.fakeLink {
+    cursor:pointer;
+    color:blue;
+    text-decoration:underline;
+}
+
+.fakeLink:hover {
+    text-decoration:none;
+    text-shadow: 1px 1px 1px #555;
+}
+
+.bluebold {
+    font-weight: bold;
+    color: blue;
+}
+
+.redbold {
+    font-weight:bold;
+    color: red;
+}
+
+@media only screen and (max-width: 992px) {
+
+    .smallscreen{
+        /* padding-left: 0 !important; */
+        font-size: 0.8em;
+        /* color: lightseagreen; */
+      }
+}
