@@ -3,3 +3,6 @@ TODOLIST.txt
 build
 .vscode
 .claude
+
+# Generated dictionary file (created by scripts/processDictionary.js)
+src/Utils/Dictionary/definitions.js

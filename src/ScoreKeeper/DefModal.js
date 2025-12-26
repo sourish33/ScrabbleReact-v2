@@ -5,7 +5,18 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import styles from './DefModal.module.css'
 
-const SERVER_ADDRESS = "https://scrabble-api-2n61.onrender.com"
+// Cache for definitions (loaded lazily on first use)
+let definitionsCache = null;
+
+// Function to load and retrieve definition
+const getDefinition = async (word) => {
+  if (!definitionsCache) {
+    // Lazy load definitions only when first needed
+    const module = await import('../Utils/Dictionary/definitions.js');
+    definitionsCache = module.definitions;
+  }
+  return definitionsCache[word.toUpperCase()] || null;
+};
 
 export const DefModal = ({show, setShow, word}) => {
 
@@ -18,24 +29,28 @@ export const DefModal = ({show, setShow, word}) => {
   }
 
   useEffect(()=>{
-    fetch(`${SERVER_ADDRESS}/dictionary?word=${word}`)
-    .then(res=>res.json())
-    .then((data)=>{
+    // Fetch definition from local cache
+    getDefinition(word)
+      .then((def) => {
         setShowSpinner(false)
-        if (data && data.definition.length>0){
-            console.log(data.definition[0].Definition)
-            setDefinition(data.definition[0].Definition)
-        } else{
-            setDefinition("No definition found")
+        if (def) {
+          console.log(def)
+          setDefinition(def)
+        } else {
+          setDefinition("No definition found")
         }
-        
-    })
+      })
+      .catch((error) => {
+        console.error('Error loading definition:', error)
+        setShowSpinner(false)
+        setDefinition("Error loading definition")
+      })
 
     return () => {
         setDefinition("")
         setShowSpinner(true)
     }
-    
+
 
   },[word])
 
