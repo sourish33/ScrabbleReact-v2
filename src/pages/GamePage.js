@@ -17,6 +17,13 @@ const GamePage = () => {
   }, [gameVariables, navigate]);
 
   const exitGame = () => {
+    // Clear game state from localStorage
+    localStorage.removeItem('scrabble-tilesAndBag');
+    localStorage.removeItem('scrabble-playersAndPoints');
+    localStorage.removeItem('scrabble-gameState');
+    localStorage.removeItem('scrabble-lastPlayed');
+    localStorage.removeItem('scrabble-gameIsOver');
+
     // Navigate back to home (no reload!)
     navigate('/', { replace: true });
   };
