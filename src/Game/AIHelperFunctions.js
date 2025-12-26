@@ -123,7 +123,7 @@ function makeAllHorSlots(tiles, lp, sub) {
         for (let n = 2; n < 15; n++) {
             let slots = makeHorSlots(y, n, lp, sub)
             for (let slot of slots) {
-                slot.sort()
+                // Slots are already in order from makeHorSlots, no need to sort
                 let str = JSON.stringify(slot)
                 if (!arrMap.has(str)) {
                     arrMap.set(str, slot)
@@ -144,7 +144,7 @@ function makeAllVerSlots(tiles, lp, sub) {
         for (let n = 2; n < 15; n++) {
             let slots = makeVerSlots(x, n, lp, sub)
             for (let slot of slots) {
-                slot.sort()
+                // Slots are already in order from makeVerSlots, no need to sort
                 let str = JSON.stringify(slot)
                 if (!arrMap.has(str)) {
                     arrMap.set(str, slot)
