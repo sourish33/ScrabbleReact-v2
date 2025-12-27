@@ -6,6 +6,10 @@ import { AI_LIST } from "../Utils/Data"
 import { randomUpTo, subtractArrays } from "../Utils/helpers"
 import styles from "./GameInfo.module.css"
 
+// Game configuration - adjust these values to change game limits
+const MAX_PLAYERS = 2;        // Maximum total number of players (humans + AI)
+const MAX_AI_PLAYERS = 1;     // Maximum number of AI players allowed
+const DEFAULT_AI_LEVEL = 2;   // Default AI difficulty: 1=Weak, 2=Medium, 3=Strong
 
 const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, onDiscardGame }) => {
 
@@ -49,12 +53,19 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, 
     }
 
     const handleClickAI = (event) => {
+        // Count current AI players
         let currentAIs = players.filter((el)=>{
            return el.level>0
         })
+
+        // Don't add if we've reached the AI limit
+        if (currentAIs.length >= MAX_AI_PLAYERS) {
+            return;
+        }
+
         let currrentAInames = currentAIs.map(el=>el.name)
         let unusedAIs = subtractArrays(AI_LIST, currrentAInames)
-        let newInput = { name: unusedAIs[randomUpTo(unusedAIs.length-1)], level: 1 }//pick a random AI name that hsnt been used
+        let newInput = { name: unusedAIs[randomUpTo(unusedAIs.length-1)], level: DEFAULT_AI_LEVEL }//pick a random AI name that hsnt been used
         setPlayers((x) => {
             return [...x, newInput]
         })
@@ -205,12 +216,12 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, 
                     {playerform}
                 </div> : null }
                 <ButtonToolbar aria-label="Toolbar with button groups">
-                    {players.length < 4 ? (
+                    {players.length < MAX_PLAYERS ? (
                         <Button variant="primary" type="button" className={'me-2'} onClick={handleClickHuman}>
                             Add Human
                         </Button>
                     ) : null}
-                    {players.length < 4 ? (
+                    {players.length < MAX_PLAYERS && players.filter(p => p.level > 0).length < MAX_AI_PLAYERS ? (
                         <Button variant="primary" type="button" className={'me-2'} onClick={handleClickAI}>
                             Add Computer
                         </Button>
