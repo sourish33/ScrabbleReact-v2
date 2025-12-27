@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/ScrabbleReact-v2/static/css/main.be5195c0.css",
-    "main.js": "/ScrabbleReact-v2/static/js/main.790f5892.js",
-    "static/js/373.6c21d11f.chunk.js": "/ScrabbleReact-v2/static/js/373.6c21d11f.chunk.js",
+    "main.css": "/ScrabbleReact-v2/static/css/main.e9abbd3f.css",
+    "main.js": "/ScrabbleReact-v2/static/js/main.bacf0453.js",
+    "static/js/373.2ff48896.chunk.js": "/ScrabbleReact-v2/static/js/373.2ff48896.chunk.js",
     "static/js/726.b9efeb6d.chunk.js": "/ScrabbleReact-v2/static/js/726.b9efeb6d.chunk.js",
     "static/js/695.82f1ef6e.chunk.js": "/ScrabbleReact-v2/static/js/695.82f1ef6e.chunk.js",
     "static/media/dinodance.gif": "/ScrabbleReact-v2/static/media/dinodance.3487c0327e452d2661fa.gif",
@@ -13,7 +13,7 @@
     "index.html": "/ScrabbleReact-v2/index.html"
   },
   "entrypoints": [
-    "static/css/main.be5195c0.css",
-    "static/js/main.790f5892.js"
+    "static/css/main.e9abbd3f.css",
+    "static/js/main.bacf0453.js"
   ]
 }
