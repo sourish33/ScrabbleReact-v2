@@ -4,15 +4,45 @@ import styles from "./Instructions.module.css"
 const StartInstructions = () => {
     return(
         <div>
-          In this Scrabble game you always have access  to the Scrabble Dictionary. Feel free to use it to come up with the best words you can find!
-              <ul>
-                <li>Clicking <span className={styles.infobox}>Add Human</span> adds a human player</li>
-                <li>Clicking <span className={styles.infobox}>Add Computer</span> adds a Artificial Intelligence player.</li>
-                <li>Select the strength of each AI player (stronger = more thinking time)</li>
-                <li>Enable/Disable dictionary checking. If dictionary checking is on, each submitted word will be checked against the official Scrabble dictionary</li>
-                <li>Choose the how the game should end.</li>
-                <li>Press <span className={styles.infobox}>Start Game</span> to begin the game.</li>
-              </ul>
+          <div className={styles.tip}>
+            <span className={styles.tipIcon}>💡</span>
+            <strong>What makes this special?</strong> In Tortoise Scrabble, you always have access to the Scrabble Dictionary! Feel free to look up words and strategize to find the best plays.
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Setting Up Your Game</div>
+            <ul>
+              <li>Click <span className={styles.infobox}>+ Add Human</span> to add a human player (you can add up to 2 players total)</li>
+              <li>Click <span className={styles.infobox}>+ Add Computer</span> to add an AI opponent (maximum 1 AI player)</li>
+              <li>For AI players, select their difficulty level:
+                <ul>
+                  <li><strong>Weak:</strong> Fast moves, easier to beat</li>
+                  <li><strong>Medium:</strong> Balanced challenge (recommended)</li>
+                  <li><strong>Strong:</strong> Takes more time to think, harder to beat</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Game Options</div>
+            <ul>
+              <li><strong>Shuffle Players:</strong> Randomize the turn order before starting</li>
+              <li><strong>Dictionary Checking:</strong> When enabled, all played words are verified against the official Scrabble dictionary</li>
+              <li><strong>Game Type:</strong> Choose how the game ends:
+                <ul>
+                  <li><strong>75 Point Game:</strong> Quick match, first to 75 points wins</li>
+                  <li><strong>150 Point Game:</strong> Standard match, first to 150 points wins</li>
+                  <li><strong>Till The Tiles Run Out:</strong> Play until all tiles are used</li>
+                </ul>
+              </li>
+            </ul>
+          </div>
+
+          <div className={styles.section}>
+            <div className={styles.sectionTitle}>Ready to Play?</div>
+            <p>Once you've configured your game, click the <span className={styles.infobox}>Start Game</span> button to begin!</p>
+          </div>
         </div>
     )
 }

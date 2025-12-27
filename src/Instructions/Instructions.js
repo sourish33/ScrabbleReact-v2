@@ -6,18 +6,20 @@ import StartInstructions from "./StartInstructions"
 
 const Instructions = ({ show, onHide, playInstr }) => {
     return (
-        <Modal show={show}>
+        <Modal show={show} size="lg" centered>
         <Modal.Header className={styles.centerAlign}>
             <Modal.Title>
-                <h1> Instructions</h1>
+                <h1 style={{ margin: 0, fontSize: '1.75rem' }}>
+                    {playInstr ? "How to Play" : "Getting Started"}
+                </h1>
             </Modal.Title>
-        <CloseButton onClick={onHide} />  
+        <CloseButton onClick={onHide} variant="white" />
         </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className={styles.instructionsBody}>
                 {playInstr ? <PlayInstructions/>: <StartInstructions/>}
             </Modal.Body>
             <Modal.Footer className={styles.rightAlign}>
-                    <Button variant="secondary" type="button" onClick={onHide}>Close</Button>
+                    <Button variant="primary" type="button" onClick={onHide}>Got it!</Button>
             </Modal.Footer>
         </Modal>
     )
