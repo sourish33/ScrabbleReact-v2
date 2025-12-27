@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/ScrabbleReact-v2/static/css/main.e9abbd3f.css",
-    "main.js": "/ScrabbleReact-v2/static/js/main.f0872c07.js",
+    "main.js": "/ScrabbleReact-v2/static/js/main.89e2cf8e.js",
     "static/js/373.2ff48896.chunk.js": "/ScrabbleReact-v2/static/js/373.2ff48896.chunk.js",
     "static/js/726.b9efeb6d.chunk.js": "/ScrabbleReact-v2/static/js/726.b9efeb6d.chunk.js",
     "static/js/695.82f1ef6e.chunk.js": "/ScrabbleReact-v2/static/js/695.82f1ef6e.chunk.js",
@@ -14,6 +14,6 @@
   },
   "entrypoints": [
     "static/css/main.e9abbd3f.css",
-    "static/js/main.f0872c07.js"
+    "static/js/main.89e2cf8e.js"
   ]
 }
