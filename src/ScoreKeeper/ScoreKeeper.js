@@ -10,22 +10,45 @@ const gameType = (points) => {
     return points === 10000 ? "Till out of tiles" : `${points} point game`
 }
 
+const CURRENT_PLAYER_NAME_MAX_LENGTH = 8
+
 const engLevels = {0: "", 1: "(Weak)", 2: "(Medium)", 3: "(Strong)"}//used to display the level of the AI
+
+const CurrentTurnHeader = ({ currentPlayerName, currentPlayerLevel }) => {
+    // For AI players (level > 0), display "AI" with difficulty level
+    // For human players (level === 0), truncate name if too long
+    const displayName = currentPlayerLevel > 0
+        ? "AI"
+        : currentPlayerName.length > CURRENT_PLAYER_NAME_MAX_LENGTH
+            ? currentPlayerName.substring(0, CURRENT_PLAYER_NAME_MAX_LENGTH) + '...'
+            : currentPlayerName
+
+    return (
+        <div className={styles.currentTurnHeader}>
+            <div className={styles.currentTurnLabel}>Current Turn</div>
+            <div className={styles.currentTurnName}>
+                {displayName} {engLevels[currentPlayerLevel]}
+            </div>
+        </div>
+    )
+}
 
 const scoreTable = (playersAndPoints, currentPlayer) => {
     return (
         <Table bordered className={styles.mytable}>
             <tbody>
                 {playersAndPoints.map((el, ind) => {
+                    const isCurrentPlayer = ind === currentPlayer
                     return (
                         <tr
                             key={"row" + ind}
                             style={
-                                ind === currentPlayer
-                                    ? { background: "yellow" }
+                                isCurrentPlayer
+                                    ? { background: "#ffe066", fontWeight: "bold" }
                                     : null
                             }>
                             <td>
+                                {isCurrentPlayer && <span className={styles.turnArrow}>► </span>}
                                 <span className={styles.bold}>{`${el.name} ${engLevels[el.level]}`}</span>
                             </td>
                             <td>{el.points}</td>
@@ -85,19 +108,30 @@ const LastPlayed = ({ lastPlayed }) => {
     )
 }
 
-const Buttons = ({ showInstructions, exitGame }) => {
+const Buttons = ({ showInstructions, exitGame, saveAndExit, isAIThinking, gameIsOver }) => {
     return (
-        <div className={`d-flex flex-row justify-content-center`}>
-            <div className="p-2 mt-0">
-                <Button variant="info" onClick={showInstructions}>
-                    <ButtonContent text={"Instructions"}/>
-                </Button>
+        <div className={`d-flex flex-column`}>
+            <div className={`d-flex flex-row justify-content-center`}>
+                <div className="p-2 mt-0">
+                    <Button variant="info" onClick={showInstructions} disabled={isAIThinking}>
+                        <ButtonContent text={"Instructions"}/>
+                    </Button>
+                </div>
+                <div className="p-2 mt-0">
+                    <Button variant="danger" onClick={exitGame} disabled={isAIThinking}>
+                        <ButtonContent text={"Exit"}/>
+                    </Button>
+                </div>
             </div>
-            <div className="p-2 mt-0">
-                <Button variant="danger" onClick={exitGame}>
-                    <ButtonContent text={"Exit"}/>
-                </Button>
-            </div>
+            {!gameIsOver && (
+                <div className={`d-flex flex-row justify-content-center`}>
+                    <div className="p-2 mt-0">
+                        <Button variant="success" onClick={saveAndExit} disabled={isAIThinking}>
+                            <ButtonContent text={"Save & Exit"}/>
+                        </Button>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
@@ -110,8 +144,10 @@ const ScoreKeeper = (props) => {
         }
         Swal.fire({
             title: "Are you sure you want to quit?",
+            text: "Your game will not be saved.",
             showCancelButton: true,
             confirmButtonText: "Quit",
+            confirmButtonColor: '#d33',
         }).then((result) => {
             if (result.isConfirmed) {
                 props.exitGame()
@@ -120,12 +156,40 @@ const ScoreKeeper = (props) => {
         })
     }
 
+    const saveAndExitWithConfirmation = () => {
+        if (props.gameIsOver) {
+            props.exitGame()
+            return
+        }
+        Swal.fire({
+            title: "Save game and exit?",
+            text: "You can resume this game later from the main menu.",
+            icon: "info",
+            showCancelButton: true,
+            confirmButtonText: "Save & Exit",
+            confirmButtonColor: '#28a745',
+            cancelButtonText: "Cancel"
+        }).then((result) => {
+            if (result.isConfirmed) {
+                props.saveAndExit()
+            }
+        })
+    }
+
+    const currentPlayerData = props.playersAndPoints[props.currentPlayer]
+
     return (
         <div className={`d-flex flex-column`}>
             <div
                 className={`p-1 mb-2 justify-content-center ${styles["pointsOuterBox"]}`}>
                 Points possible:{" "}
                 <span className={styles.bold}>{props.pointsPossible}</span>
+            </div>
+            <div className="p-1 mb-2 justify-content-center">
+                <CurrentTurnHeader
+                    currentPlayerName={currentPlayerData.name}
+                    currentPlayerLevel={currentPlayerData.level}
+                />
             </div>
             <div className="p-1 mb-2 justify-content-center">
                 {scoreTable(props.playersAndPoints, props.currentPlayer)}
@@ -144,6 +208,9 @@ const ScoreKeeper = (props) => {
                 <Buttons
                     showInstructions={props.showInstructions}
                     exitGame={exitWithWarning}
+                    saveAndExit={saveAndExitWithConfirmation}
+                    isAIThinking={props.isAIThinking}
+                    gameIsOver={props.gameIsOver}
                 />
             </div>
             <div className="p-1 mb-2 justify-content-center">

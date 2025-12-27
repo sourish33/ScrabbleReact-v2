@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Col, Container, Row } from "react-bootstrap"
 import Swal from "sweetalert2"
 import BoardAndRack from "../BoardAndRack"
@@ -37,21 +37,23 @@ import {
 } from "./AIHelperFunctions"
 import AIThinkingModal from "../AIThinkingModal/AIThinkingModal"
 import Instructions from "../Instructions/Instructions"
+import useLocalStorage from "../hooks/useLocalStorage"
+import useLocalStorageReducer from "../hooks/useLocalStorageReducer"
 
 
-const Game = ({ gameVariables, exitGame }) => {
+const Game = ({ gameVariables, exitGame, saveAndExit }) => {
 
     const initialTilesAndBag = {tiles: [], bag: Bag}
     const [showDict, setShowDict] = useState(false)
     const [showEx, setShowEx] = useState(false)
-    const [lastPlayed, setLastPlayed] = useState([])
+    const [lastPlayed, setLastPlayed] = useLocalStorage('scrabble-lastPlayed', [])
     const [pointsPossible, setPointsPossible] = useState(0)
     const [buttonsDisabled, setButtonsDisabled] = useState(false)
     const [selectedTiles, setSelectedTiles] = useState(new Set())
     const initialState = { mn: 0, cp: 0 }
     const [greeting, setGreeting] = useState("")
     const [showVictoryBox, setShowVictoryBox] = useState(false)
-    const [gameIsOver, setGameIsOver] = useState(false)
+    const [gameIsOver, setGameIsOver] = useLocalStorage('scrabble-gameIsOver', false)
     const [showAIThinking, setShowAIThinking] =  useState(false)
     const [aiSays, setAiSays] = useState("")
     const [showInstr, setShowInstr] = useState(false)
@@ -66,7 +68,7 @@ const Game = ({ gameVariables, exitGame }) => {
     const playerTable = makePlayertable(players, shufflePlayers)
     const numPlayers = playerTable.length
     const AIPlayersExist = playerTable.filter((el) => el.level > 0).length > 0 //whether AI players exist
-    const [playersAndPoints, setPlayersAndPoints] = useState(playerTable)
+    const [playersAndPoints, setPlayersAndPoints] = useLocalStorage('scrabble-playersAndPoints', playerTable)
     const [showPassDevice, setShowPassDevice] = useState(playersAndPoints[0].level === 0)
 
 
@@ -88,7 +90,7 @@ const Game = ({ gameVariables, exitGame }) => {
                 return state
         }
     }
-    const [gameState, dispatch] = useReducer(gsreducer, initialState)
+    const [gameState, dispatch] = useLocalStorageReducer('scrabble-gameState', gsreducer, initialState)
 
     const advanceGameState = () => {
         dispatch({ type: "ADVANCE" })
@@ -116,7 +118,7 @@ const Game = ({ gameVariables, exitGame }) => {
 
     }
 
-    const [tilesAndBag, tbdispatch] = useReducer(tilesAndBagReducer, initialTilesAndBag)
+    const [tilesAndBag, tbdispatch] = useLocalStorageReducer('scrabble-tilesAndBag', tilesAndBagReducer, initialTilesAndBag)
 
     const updateTilesAndBag = (newTiles, newBag) => {
         tbdispatch({type: "UPDATE_TILES_AND_BAG", bag: newBag, tiles: newTiles})
@@ -313,6 +315,7 @@ const Game = ({ gameVariables, exitGame }) => {
                 letter: bag[inds[i]][1],
                 points: parseInt(bag[inds[i]][2]),
                 submitted: playersAndPoints[gameState.cp].level > 0,
+                animated: false,
             })
         }
         //update the states
@@ -360,6 +363,7 @@ const Game = ({ gameVariables, exitGame }) => {
                     letter: bag[inds[i]][1],
                     points: parseInt(bag[inds[i]][2]),
                     submitted: playersAndPoints[currentPlayer].level > 0,
+                    animated: false,
                 })
             }
             let newBag = subtractArrays(bag, removeFromBag)
@@ -504,6 +508,7 @@ const Game = ({ gameVariables, exitGame }) => {
                     let tilesNowSubmitted = []
                     for (let tile of tpns) {
                         tile.submitted = true
+                        tile.animated = true
                         tilesNowSubmitted.push(tile)
                     }
                     resolve([
@@ -585,6 +590,13 @@ const Game = ({ gameVariables, exitGame }) => {
 
     const hideModalVictory = () => {
         setShowVictoryBox((x) => false)
+        // Clear localStorage when closing victory modal (user may exit after)
+        localStorage.removeItem('scrabble-tilesAndBag');
+        localStorage.removeItem('scrabble-playersAndPoints');
+        localStorage.removeItem('scrabble-gameState');
+        localStorage.removeItem('scrabble-lastPlayed');
+        localStorage.removeItem('scrabble-gameIsOver');
+        localStorage.removeItem('scrabble-gameSettings');
     }
 
     const play = () => {
@@ -618,6 +630,7 @@ const Game = ({ gameVariables, exitGame }) => {
         let tilesNowSubmitted = []
         for (let tile of tpns) {
             tile.submitted = true
+            tile.animated = true
             tilesNowSubmitted.push(tile)
         }
         updateTiles([...subtractArrays(tiles, tpns), ...tilesNowSubmitted])
@@ -654,6 +667,7 @@ const Game = ({ gameVariables, exitGame }) => {
                 letter: bag[inds[i]][1],
                 points: parseInt(bag[inds[i]][2]),
                 submitted: playersAndPoints[currentPlayer].level > 0,
+                animated: false,
             })
         }
         let newBag = subtractArrays(bag, removeFromBag)
@@ -740,9 +754,11 @@ const Game = ({ gameVariables, exitGame }) => {
                             maxPoints={maxPoints}
                             lastPlayed={lastPlayed}
                             exitGame={exitGame}
+                            saveAndExit={saveAndExit}
                             showInstructions = {showInstructions}
                             dictChecking={dictChecking}
                             gameIsOver={gameIsOver}
+                            isAIThinking={showAIThinking}
                         />
                     </Col>
                 </Row>

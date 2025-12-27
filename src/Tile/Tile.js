@@ -5,7 +5,10 @@ const Tile = (props) => {
     //the opposite of submitted is sent to this component from Board - could be refactored later
     let classes = styles['tile']
     if (props.boardTile) {
-        classes = !props.submitted? `${styles['tile']} ${styles['submitted']}`: styles['tile']
+        // Only animate if tile is newly submitted (submitted=false means played, animated=false means not animated yet)
+        // props.submitted is inverted: false = submitted to board, true = still on rack
+        const shouldAnimate = !props.submitted && props.animated !== true
+        classes = shouldAnimate ? `${styles['tile']} ${styles['submitted']}`: styles['tile']
     }
 
 
