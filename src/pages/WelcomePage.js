@@ -4,6 +4,7 @@ import { Container } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import GameInfo from '../GameInfo/GameInfo';
 import styles from './WelcomePage.module.css';
+import { STORAGE_KEYS, clearGameData, hasSavedGame as checkSavedGame, getSavedSettings, getSavedPlayersAndPoints } from '../Utils/localStorage';
 
 const WelcomePage = () => {
   const navigate = useNavigate();
@@ -13,31 +14,22 @@ const WelcomePage = () => {
 
   useEffect(() => {
     // Check if there's a game in progress (non-blocking)
-    const savedGameState = localStorage.getItem('scrabble-gameState');
-    const savedPlayersAndPoints = localStorage.getItem('scrabble-playersAndPoints');
-    const savedTilesAndBag = localStorage.getItem('scrabble-tilesAndBag');
-
-    if (savedGameState && savedPlayersAndPoints && savedTilesAndBag) {
+    if (checkSavedGame()) {
       try {
-        const playersAndPoints = JSON.parse(savedPlayersAndPoints);
+        const playersAndPoints = getSavedPlayersAndPoints();
         const playerNames = playersAndPoints.map(p => p.name).join(', ');
         setSavedPlayerNames(playerNames);
         setHasSavedGame(true);
 
         // Get saved settings
-        const settings = localStorage.getItem('scrabble-gameSettings');
+        const settings = getSavedSettings();
         if (settings) {
-          setSavedSettings(JSON.parse(settings));
+          setSavedSettings(settings);
         }
       } catch (error) {
         console.error('Error parsing saved game:', error);
         // Clear corrupted data
-        localStorage.removeItem('scrabble-tilesAndBag');
-        localStorage.removeItem('scrabble-playersAndPoints');
-        localStorage.removeItem('scrabble-gameState');
-        localStorage.removeItem('scrabble-lastPlayed');
-        localStorage.removeItem('scrabble-gameIsOver');
-        localStorage.removeItem('scrabble-gameSettings');
+        clearGameData();
       }
     }
   }, []);
@@ -45,8 +37,7 @@ const WelcomePage = () => {
   const handleResumeGame = () => {
     if (!hasSavedGame) return;
 
-    const savedPlayersAndPoints = localStorage.getItem('scrabble-playersAndPoints');
-    const playersAndPoints = JSON.parse(savedPlayersAndPoints);
+    const playersAndPoints = getSavedPlayersAndPoints();
 
     const gameVariables = {
       players: playersAndPoints.map(p => ({ name: p.name, level: p.level })),
@@ -60,12 +51,7 @@ const WelcomePage = () => {
 
   const handleDiscardGame = () => {
     // Clear all saved game data from localStorage
-    localStorage.removeItem('scrabble-tilesAndBag');
-    localStorage.removeItem('scrabble-playersAndPoints');
-    localStorage.removeItem('scrabble-gameState');
-    localStorage.removeItem('scrabble-lastPlayed');
-    localStorage.removeItem('scrabble-gameIsOver');
-    localStorage.removeItem('scrabble-gameSettings');
+    clearGameData();
 
     // Hide the resume game card
     setHasSavedGame(false);
@@ -97,18 +83,13 @@ const WelcomePage = () => {
     }
 
     // Clear any existing saved game before starting new one
-    localStorage.removeItem('scrabble-tilesAndBag');
-    localStorage.removeItem('scrabble-playersAndPoints');
-    localStorage.removeItem('scrabble-gameState');
-    localStorage.removeItem('scrabble-lastPlayed');
-    localStorage.removeItem('scrabble-gameIsOver');
-    localStorage.removeItem('scrabble-gameSettings');
+    clearGameData();
 
     // Hide resume button after starting new game
     setHasSavedGame(false);
 
     // Save game settings for potential resume
-    localStorage.setItem('scrabble-gameSettings', JSON.stringify({
+    localStorage.setItem(STORAGE_KEYS.GAME_SETTINGS, JSON.stringify({
       dictCheck: dictCheck,
       gameType: gameType
     }));

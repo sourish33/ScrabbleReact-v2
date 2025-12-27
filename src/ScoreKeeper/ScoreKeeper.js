@@ -10,7 +10,7 @@ const gameType = (points) => {
     return points === 10000 ? "Till out of tiles" : `${points} point game`
 }
 
-const CURRENT_PLAYER_NAME_MAX_LENGTH = 8
+const CURRENT_PLAYER_NAME_MAX_LENGTH = 12
 
 const engLevels = {0: "", 1: "(Weak)", 2: "(Medium)", 3: "(Strong)"}//used to display the level of the AI
 

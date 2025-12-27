@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import Game from '../Game/Game';
+import { clearGameData } from '../Utils/localStorage';
 
 const GamePage = () => {
   const location = useLocation();
@@ -18,12 +19,7 @@ const GamePage = () => {
 
   const exitGame = () => {
     // Clear game state from localStorage
-    localStorage.removeItem('scrabble-tilesAndBag');
-    localStorage.removeItem('scrabble-playersAndPoints');
-    localStorage.removeItem('scrabble-gameState');
-    localStorage.removeItem('scrabble-lastPlayed');
-    localStorage.removeItem('scrabble-gameIsOver');
-    localStorage.removeItem('scrabble-gameSettings');
+    clearGameData();
 
     // Navigate back to home (no reload!)
     navigate('/', { replace: true });
