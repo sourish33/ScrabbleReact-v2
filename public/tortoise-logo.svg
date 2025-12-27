@@ -1,0 +1,71 @@
+<svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background circle with gradient -->
+    <defs>
+        <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+        </linearGradient>
+        <linearGradient id="shellGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color:#A0826D;stop-opacity:1" />
+            <stop offset="100%" style="stop-color:#8B7355;stop-opacity:1" />
+        </linearGradient>
+    </defs>
+
+    <!-- Background -->
+    <rect width="192" height="192" rx="30" fill="url(#bgGradient)"/>
+
+    <!-- Turtle facing right -->
+    
+    <!-- Back leg (behind shell) -->
+    <ellipse cx="70" cy="115" rx="10" ry="16" fill="#9ACD32"/>
+    <ellipse cx="70" cy="128" rx="12" ry="8" fill="#8B9C5F"/>
+    
+    <!-- Tail -->
+    <path d="M 55 100 Q 45 105 48 115" fill="#9ACD32" stroke="#8B9C5F" stroke-width="1.5"/>
+    
+    <!-- Shell - dome shaped for side view -->
+    <ellipse cx="95" cy="95" rx="45" ry="38" fill="url(#shellGradient)"/>
+    
+    <!-- Shell pattern - hexagonal sections -->
+    <path d="M 75 80 L 85 75 L 95 80 L 95 90 L 85 95 L 75 90 Z" fill="#8B7355" opacity="0.6"/>
+    <path d="M 95 80 L 105 75 L 115 80 L 115 90 L 105 95 L 95 90 Z" fill="#8B7355" opacity="0.6"/>
+    <path d="M 85 95 L 95 90 L 105 95 L 105 105 L 95 110 L 85 105 Z" fill="#8B7355" opacity="0.5"/>
+    
+    <!-- Shell rim/edge -->
+    <ellipse cx="95" cy="95" rx="45" ry="38" fill="none" stroke="#6B5345" stroke-width="2.5" opacity="0.4"/>
+    
+    <!-- Front leg -->
+    <ellipse cx="120" cy="115" rx="11" ry="16" fill="#9ACD32"/>
+    <ellipse cx="120" cy="128" rx="13" ry="8" fill="#8B9C5F"/>
+    
+    <!-- Back front leg (partially visible) -->
+    <ellipse cx="110" cy="118" rx="9" ry="14" fill="#8B9C5F" opacity="0.7"/>
+    
+    <!-- Neck -->
+    <path d="M 130 85 Q 138 80 145 75" fill="#9ACD32" stroke="#8B9C5F" stroke-width="1.5"/>
+    
+    <!-- Head -->
+    <ellipse cx="150" cy="70" rx="16" ry="14" fill="#9ACD32"/>
+    
+    <!-- Eye -->
+    <circle cx="157" cy="68" r="3.5" fill="#000"/>
+    <circle cx="158" cy="67" r="1" fill="#fff"/>
+    
+    <!-- Nostril -->
+    <circle cx="163" cy="72" r="1.5" fill="#6B5345"/>
+    
+    <!-- Smile -->
+    <path d="M 155 75 Q 158 76 161 75" stroke="#000" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+    
+    <!-- Neck detail/wrinkle -->
+    <path d="M 138 78 Q 140 80 142 78" stroke="#8B9C5F" stroke-width="1" fill="none"/>
+    
+    <!-- Letter tiles decoration -->
+    <rect x="30" y="145" width="28" height="28" rx="3" fill="#F5DEB3" stroke="#8B7355" stroke-width="2"/>
+    <text x="44" y="166" font-family="Arial" font-size="20" font-weight="bold" fill="#000" text-anchor="middle">T</text>
+    <text x="50" y="172" font-family="Arial" font-size="8" fill="#000">1</text>
+
+    <rect x="134" y="145" width="28" height="28" rx="3" fill="#F5DEB3" stroke="#8B7355" stroke-width="2"/>
+    <text x="148" y="166" font-family="Arial" font-size="20" font-weight="bold" fill="#000" text-anchor="middle">S</text>
+    <text x="154" y="172" font-family="Arial" font-size="8" fill="#000">1</text>
+</svg>

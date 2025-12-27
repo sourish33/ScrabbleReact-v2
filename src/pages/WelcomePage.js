@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Container } from 'react-bootstrap';
 import Swal from 'sweetalert2';
 import GameInfo from '../GameInfo/GameInfo';
+import TortoiseLogo from '../components/TortoiseLogo';
 import styles from './WelcomePage.module.css';
 import { STORAGE_KEYS, clearGameData, hasSavedGame as checkSavedGame, getSavedSettings, getSavedPlayersAndPoints } from '../Utils/localStorage';
 
@@ -107,12 +108,17 @@ const WelcomePage = () => {
   };
 
   return (
-    <div style={{top:'0.5px'}}>
-      <div className={`p-5 mb-4 bg-light rounded-3 ${styles.headerImage}`}>
-        <h1 className="display-4">Tortoise Scrabble</h1>
-        <h3>A Scrabble Game where it is legal to cheat!</h3>
+    <div className={styles.fadeIn}>
+      <div className={`p-5 mb-5 ${styles.headerImage}`}>
+        <div className={styles.logoContainer}>
+          <TortoiseLogo size={100} className={styles.logo} />
+          <div className={styles.titleContainer}>
+            <h1>Tortoise Scrabble</h1>
+            <h3>A Scrabble Game where it is legal to cheat!</h3>
+          </div>
+        </div>
       </div>
-      <Container>
+      <Container className={styles.container}>
         <GameInfo
           handleSubmit={handleSubmit}
           hasSavedGame={hasSavedGame}
@@ -120,7 +126,7 @@ const WelcomePage = () => {
           onResumeGame={handleResumeGame}
           onDiscardGame={handleDiscardGame}
         />
-        <p style={{textAlign:'right'}}>
+        <div className={styles.feedbackLink}>
           <a
             href="https://forms.gle/4FfSmwEHkgjvYZK7A"
             target="_blank"
@@ -128,7 +134,7 @@ const WelcomePage = () => {
           >
             Leave Feedback
           </a>
-        </p>
+        </div>
       </Container>
     </div>
   );

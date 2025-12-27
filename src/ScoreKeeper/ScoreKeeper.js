@@ -3,6 +3,7 @@ import { useState } from "react"
 import { Table, Button} from "react-bootstrap"
 import Swal from "sweetalert2"
 import ButtonContent from "../UI/ButtonContent/ButtonContent"
+import TortoiseLogo from "../components/TortoiseLogo"
 import { DefModal } from "./DefModal"
 import styles from "./ScoreKeeper.module.css"
 
@@ -10,28 +11,7 @@ const gameType = (points) => {
     return points === 10000 ? "Till out of tiles" : `${points} point game`
 }
 
-const CURRENT_PLAYER_NAME_MAX_LENGTH = 12
-
 const engLevels = {0: "", 1: "(Weak)", 2: "(Medium)", 3: "(Strong)"}//used to display the level of the AI
-
-const CurrentTurnHeader = ({ currentPlayerName, currentPlayerLevel }) => {
-    // For AI players (level > 0), display "AI" with difficulty level
-    // For human players (level === 0), truncate name if too long
-    const displayName = currentPlayerLevel > 0
-        ? "AI"
-        : currentPlayerName.length > CURRENT_PLAYER_NAME_MAX_LENGTH
-            ? currentPlayerName.substring(0, CURRENT_PLAYER_NAME_MAX_LENGTH) + '...'
-            : currentPlayerName
-
-    return (
-        <div className={styles.currentTurnHeader}>
-            <div className={styles.currentTurnLabel}>Current Turn</div>
-            <div className={styles.currentTurnName}>
-                {displayName} {engLevels[currentPlayerLevel]}
-            </div>
-        </div>
-    )
-}
 
 const scoreTable = (playersAndPoints, currentPlayer) => {
     return (
@@ -176,20 +156,15 @@ const ScoreKeeper = (props) => {
         })
     }
 
-    const currentPlayerData = props.playersAndPoints[props.currentPlayer]
-
     return (
         <div className={`d-flex flex-column`}>
+            <div className={styles.logoSection}>
+                <TortoiseLogo size={50} />
+            </div>
             <div
                 className={`p-1 mb-2 justify-content-center ${styles["pointsOuterBox"]}`}>
                 Points possible:{" "}
                 <span className={styles.bold}>{props.pointsPossible}</span>
-            </div>
-            <div className="p-1 mb-2 justify-content-center">
-                <CurrentTurnHeader
-                    currentPlayerName={currentPlayerData.name}
-                    currentPlayerLevel={currentPlayerData.level}
-                />
             </div>
             <div className="p-1 mb-2 justify-content-center">
                 {scoreTable(props.playersAndPoints, props.currentPlayer)}

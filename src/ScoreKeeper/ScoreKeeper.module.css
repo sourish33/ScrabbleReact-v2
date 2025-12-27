@@ -73,50 +73,12 @@ th {
     color: red;
 }
 
-.currentTurnHeader {
-    width: 80%;
-    margin: 0 auto;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 8px;
-    padding: 12px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.currentTurnLabel {
-    font-size: 0.85em;
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-}
-
-.currentTurnName {
-    font-size: 1.3em;
-    color: white;
-    font-weight: bold;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
-}
-
 .turnArrow {
     color: #667eea;
     font-weight: bold;
     font-size: 1.1em;
     margin-right: 4px;
     animation: blink 1.5s ease-in-out infinite;
-}
-
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(1);
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    50% {
-        transform: scale(1.02);
-        box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
-    }
 }
 
 @keyframes blink {
@@ -128,6 +90,13 @@ th {
     }
 }
 
+.logoSection {
+    display: flex;
+    justify-content: center;
+    padding: 0.75rem 0;
+    margin-bottom: 0.5rem;
+}
+
 @media only screen and (max-width: 992px) {
 
     .smallscreen{
@@ -136,15 +105,8 @@ th {
         /* color: lightseagreen; */
       }
 
-    .currentTurnHeader {
-        padding: 10px;
-    }
-
-    .currentTurnLabel {
-        font-size: 0.75em;
-    }
-
-    .currentTurnName {
-        font-size: 1.1em;
+    /* Hide logo on mobile to save space */
+    .logoSection {
+        display: none;
     }
 }
