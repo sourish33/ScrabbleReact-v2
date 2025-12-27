@@ -758,6 +758,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                             showInstructions = {showInstructions}
                             dictChecking={dictChecking}
                             gameIsOver={gameIsOver}
+                            isAIThinking={showAIThinking}
                         />
                     </Col>
                 </Row>

@@ -1,12 +1,13 @@
 import React, { useState } from "react"
-import { Button, ButtonToolbar, Card } from "react-bootstrap"
+import { Button, ButtonToolbar } from "react-bootstrap"
 import Instructions from "../Instructions/Instructions"
+import ResumeGameCard from "./ResumeGameCard"
 import { AI_LIST } from "../Utils/Data"
 import { randomUpTo, subtractArrays } from "../Utils/helpers"
 import styles from "./GameInfo.module.css"
 
 
-const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame }) => {
+const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, onDiscardGame }) => {
 
     const [showInstr, setShowInstr] = useState(false)
     const [players, setPlayers] = useState([])
@@ -193,24 +194,11 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame }
                 }
             >
                 {hasSavedGame && (
-                    <Card className={`${styles.card} ${styles.shadow2} mb-4`}>
-                        <Card.Body>
-                            <Card.Title>Resume Game</Card.Title>
-                            <Card.Text>
-                                You have a saved game with: <strong>{savedPlayerNames}</strong>
-                            </Card.Text>
-                            <Button
-                                variant="success"
-                                onClick={onResumeGame}
-                                className="w-100"
-                            >
-                                Resume Game
-                            </Button>
-                            <div className="text-center mt-2 text-muted">
-                                <small>or start a new game below</small>
-                            </div>
-                        </Card.Body>
-                    </Card>
+                    <ResumeGameCard
+                        savedPlayerNames={savedPlayerNames}
+                        onResumeGame={onResumeGame}
+                        onDiscardGame={onDiscardGame}
+                    />
                 )}
                 {players.length>0 ?
                 <div className={`${styles.card} ${styles.shadow2} col-lg-6 col-sm-12 col-md-12`}>

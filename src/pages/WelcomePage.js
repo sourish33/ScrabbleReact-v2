@@ -58,6 +58,20 @@ const WelcomePage = () => {
     navigate('/game', { state: { gameVariables } });
   };
 
+  const handleDiscardGame = () => {
+    // Clear all saved game data from localStorage
+    localStorage.removeItem('scrabble-tilesAndBag');
+    localStorage.removeItem('scrabble-playersAndPoints');
+    localStorage.removeItem('scrabble-gameState');
+    localStorage.removeItem('scrabble-lastPlayed');
+    localStorage.removeItem('scrabble-gameIsOver');
+    localStorage.removeItem('scrabble-gameSettings');
+
+    // Hide the resume game card
+    setHasSavedGame(false);
+    setSavedPlayerNames('');
+  };
+
   const handleSubmit = (event, players, shufflePlayers, dictCheck, gameType) => {
     event.preventDefault();
 
@@ -123,6 +137,7 @@ const WelcomePage = () => {
           hasSavedGame={hasSavedGame}
           savedPlayerNames={savedPlayerNames}
           onResumeGame={handleResumeGame}
+          onDiscardGame={handleDiscardGame}
         />
         <p style={{textAlign:'right'}}>
           <a

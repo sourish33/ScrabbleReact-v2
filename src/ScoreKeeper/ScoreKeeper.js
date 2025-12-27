@@ -10,14 +10,24 @@ const gameType = (points) => {
     return points === 10000 ? "Till out of tiles" : `${points} point game`
 }
 
+const CURRENT_PLAYER_NAME_MAX_LENGTH = 8
+
 const engLevels = {0: "", 1: "(Weak)", 2: "(Medium)", 3: "(Strong)"}//used to display the level of the AI
 
 const CurrentTurnHeader = ({ currentPlayerName, currentPlayerLevel }) => {
+    // For AI players (level > 0), display "AI" with difficulty level
+    // For human players (level === 0), truncate name if too long
+    const displayName = currentPlayerLevel > 0
+        ? "AI"
+        : currentPlayerName.length > CURRENT_PLAYER_NAME_MAX_LENGTH
+            ? currentPlayerName.substring(0, CURRENT_PLAYER_NAME_MAX_LENGTH) + '...'
+            : currentPlayerName
+
     return (
         <div className={styles.currentTurnHeader}>
             <div className={styles.currentTurnLabel}>Current Turn</div>
             <div className={styles.currentTurnName}>
-                {currentPlayerName} {engLevels[currentPlayerLevel]}
+                {displayName} {engLevels[currentPlayerLevel]}
             </div>
         </div>
     )
@@ -98,28 +108,30 @@ const LastPlayed = ({ lastPlayed }) => {
     )
 }
 
-const Buttons = ({ showInstructions, exitGame, saveAndExit }) => {
+const Buttons = ({ showInstructions, exitGame, saveAndExit, isAIThinking, gameIsOver }) => {
     return (
         <div className={`d-flex flex-column`}>
             <div className={`d-flex flex-row justify-content-center`}>
                 <div className="p-2 mt-0">
-                    <Button variant="info" onClick={showInstructions}>
+                    <Button variant="info" onClick={showInstructions} disabled={isAIThinking}>
                         <ButtonContent text={"Instructions"}/>
                     </Button>
                 </div>
                 <div className="p-2 mt-0">
-                    <Button variant="danger" onClick={exitGame}>
+                    <Button variant="danger" onClick={exitGame} disabled={isAIThinking}>
                         <ButtonContent text={"Exit"}/>
                     </Button>
                 </div>
             </div>
-            <div className={`d-flex flex-row justify-content-center`}>
-                <div className="p-2 mt-0">
-                    <Button variant="success" onClick={saveAndExit}>
-                        <ButtonContent text={"Save & Exit"}/>
-                    </Button>
+            {!gameIsOver && (
+                <div className={`d-flex flex-row justify-content-center`}>
+                    <div className="p-2 mt-0">
+                        <Button variant="success" onClick={saveAndExit} disabled={isAIThinking}>
+                            <ButtonContent text={"Save & Exit"}/>
+                        </Button>
+                    </div>
                 </div>
-            </div>
+            )}
         </div>
     )
 }
@@ -197,6 +209,8 @@ const ScoreKeeper = (props) => {
                     showInstructions={props.showInstructions}
                     exitGame={exitWithWarning}
                     saveAndExit={saveAndExitWithConfirmation}
+                    isAIThinking={props.isAIThinking}
+                    gameIsOver={props.gameIsOver}
                 />
             </div>
             <div className="p-1 mb-2 justify-content-center">
