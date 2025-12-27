@@ -1,7 +1,6 @@
 {
-  "short_name": "Tortoise Scrabble",
-  "name": "Tortoise Scrabble - A Scrabble Game",
-  "description": "A Scrabble Game where it is legal to cheat!",
+  "short_name": "React App",
+  "name": "Create React App Sample",
   "icons": [
     {
       "src": "favicon.ico",
@@ -11,22 +10,16 @@
     {
       "src": "logo192.png",
       "type": "image/png",
-      "sizes": "192x192",
-      "purpose": "any maskable"
+      "sizes": "192x192"
     },
     {
       "src": "logo512.png",
       "type": "image/png",
-      "sizes": "512x512",
-      "purpose": "any maskable"
+      "sizes": "512x512"
     }
   ],
-  "start_url": "/ScrabbleReact-v2/",
-  "scope": "/ScrabbleReact-v2/",
+  "start_url": ".",
   "display": "standalone",
-  "theme_color": "#667eea",
-  "background_color": "#ffffff",
-  "orientation": "any",
-  "categories": ["games", "entertainment"],
-  "screenshots": []
+  "theme_color": "#000000",
+  "background_color": "#ffffff"
 }
