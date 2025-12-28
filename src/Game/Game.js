@@ -58,6 +58,8 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     const [aiSays, setAiSays] = useState("")
     const [showInstr, setShowInstr] = useState(false)
     const [numWorkersDone, setNumWorkersDone] = useState(0)
+    const [tilesToRemove, setTilesToRemove] = useState(null)
+    const [pendingAIMove, setPendingAIMove] = useState(null)
 
     //parsing incoming data from the welcome page
     const players = gameVariables.players
@@ -378,6 +380,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         }
         const [theTiles] = tilesBagArr
         setShowAIThinking(true)
+        setTilesToRemove(null) // Reset animation state
         const { cp: currentPlayer } = gameState
         // makeRackPerms now handles empty/partial racks gracefully
         let [p1, p2, p3, p4, p5, p6, p7] = makeRackPerms(
@@ -387,7 +390,17 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         let makeVerslots = tilesOnBoard(theTiles).length !== 0 //no need to make vertical slots if the board is empty
         let [s1, s2, s3, s4, s5, s6, s7] = makeAllSlots(theTiles, makeVerslots)
         callAllWorkers([p1, p2, p3, p4, p5, p6, p7], [s1, s2, s3, s4, s5, s6, s7], theTiles, currentPlayer)
-            .then((bestMove)=>aiSubmitMove(bestMove, tilesBagArr, currentPlayer))
+            .then((bestMove)=>{
+                // Store the move and trigger animation
+                setPendingAIMove({bestMove, tilesBagArr, currentPlayer})
+                if (bestMove.length === 0 || !bestMove.rackPerm) {
+                    // No move found, close modal immediately
+                    aiSubmitMove(bestMove, tilesBagArr, currentPlayer)
+                } else {
+                    // Trigger tile removal animation
+                    setTilesToRemove(bestMove.rackPerm)
+                }
+            })
 
     }
 
@@ -467,6 +480,16 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         moves.sort((x, y) => y.points - x.points)
         const bestMove = moves[0]
         return bestMove
+    }
+
+    // Callback when animation completes
+    const handleAnimationComplete = () => {
+        if (pendingAIMove) {
+            const {bestMove, tilesBagArr, currentPlayer} = pendingAIMove
+            aiSubmitMove(bestMove, tilesBagArr, currentPlayer)
+            setPendingAIMove(null)
+            setTilesToRemove(null)
+        }
     }
 
     const aiSubmitMove = (bestMove, tilesBagArr, currentPlayer) =>{
@@ -725,6 +748,8 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 numWorkersDone={numWorkersDone}
                 aiRack={playersAndPoints[gameState.cp]?.rack}
                 tiles={tilesAndBag.tiles}
+                tilesToRemove={tilesToRemove}
+                onAnimationComplete={handleAnimationComplete}
             />
             <Container>
                 <Row>

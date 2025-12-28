@@ -2,8 +2,52 @@ import Modal from "react-bootstrap/Modal"
 import styles from './AIThinkingModal.module.css'
 import { ProgressBar, Spinner } from "react-bootstrap"
 import Rack from "../Rack/Rack"
+import { useState, useEffect, useMemo } from "react"
 
-const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, tiles}) => {
+const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, tiles, tilesToRemove, onAnimationComplete}) => {
+    const [removedTiles, setRemovedTiles] = useState([])
+
+    // Reset animation state when modal is shown/hidden or when new tiles to remove are provided
+    useEffect(() => {
+        if (!show || !tilesToRemove || tilesToRemove.length === 0) {
+            setRemovedTiles([])
+        }
+    }, [show, tilesToRemove])
+
+    // Start animation when tilesToRemove is provided
+    useEffect(() => {
+        if (!tilesToRemove || tilesToRemove.length === 0) return
+
+        // Wait 500ms before starting tile removal
+        const initialDelay = setTimeout(() => {
+            // Remove tiles one by one with 300ms delay between each
+            let currentIndex = 0
+            const interval = setInterval(() => {
+                if (currentIndex < tilesToRemove.length) {
+                    setRemovedTiles(prev => [...prev, tilesToRemove[currentIndex]])
+                    currentIndex++
+                } else {
+                    clearInterval(interval)
+                    // Wait a bit then notify parent to close modal
+                    setTimeout(() => {
+                        if (onAnimationComplete) {
+                            onAnimationComplete()
+                        }
+                    }, 300)
+                }
+            }, 300)
+
+            return () => clearInterval(interval)
+        }, 500)
+
+        return () => clearTimeout(initialDelay)
+    }, [tilesToRemove, onAnimationComplete])
+
+    // Filter tiles to hide removed ones
+    const displayTiles = useMemo(() => {
+        if (!tiles || removedTiles.length === 0) return tiles
+        return tiles.filter(tile => !removedTiles.includes(tile.pos))
+    }, [tiles, removedTiles])
 
     let now = Math.round(100*numWorkersDone/7)
 
@@ -12,11 +56,11 @@ const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, tiles}) => {
         <Modal show={show}>
             <Modal.Body className={styles.modalbody}>
                 {/* AI's Rack */}
-                {aiRack && tiles && (
+                {aiRack && displayTiles && (
                     <div className={styles.rackContainer}>
                         <Rack
                             whichRack={aiRack}
-                            tiles={tiles}
+                            tiles={displayTiles}
                             showTiles={true}
                             DragStart={null}
                             DragOver={null}
