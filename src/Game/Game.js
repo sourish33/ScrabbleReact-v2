@@ -60,6 +60,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     const [numWorkersDone, setNumWorkersDone] = useState(0)
     const [tilesToRemove, setTilesToRemove] = useState(null)
     const [pendingAIMove, setPendingAIMove] = useState(null)
+    const [animatingTiles, setAnimatingTiles] = useState([])
 
     //parsing incoming data from the welcome page
     const players = gameVariables.players
@@ -503,6 +504,10 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
             return
         }
         const [theTiles, theBag] = tilesBagArr
+
+        // Trigger staggered bounce animation for AI tiles
+        setAnimatingTiles(bestMove.slot || [])
+
         moveNPlay(bestMove, theTiles)
             .then((newTiles) => delay(1000, newTiles))
             .then((newTiles) => {
@@ -538,6 +543,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 })
             })
             .then((newTiles) => {
+                setAnimatingTiles([])
                 updateTilesAndBag(newTiles, theBag)
                 advanceGameState()
             })
@@ -759,7 +765,8 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                             tiles={tilesAndBag.tiles}
                             visibleRack={AIPlayersExist ? playersAndPoints.find(p => p.level === 0)?.rack : playersAndPoints[gameState.cp].rack}
                             updateTiles={updateTiles}
-                            showTiles={gameIsOver? false : !showPassDevice}></BoardAndRack>
+                            showTiles={gameIsOver? false : !showPassDevice}
+                            animatingTiles={animatingTiles}></BoardAndRack>
                     </Col>
                     <Col sm={12} lg={2} md={12}>
                         <ControlButtons

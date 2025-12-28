@@ -27,12 +27,18 @@ const renderSquare = (i, piece = null) => {
     return <Square bgd={whichBgd}>{piece}</Square>
 }
 
-const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchEnd }) => {
+const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchEnd, animatingTiles = [] }) => {
     let tilesMap = arrayToMap(tiles)
 
     const squares = []
     for (let i = 0; i < 225; i++) {
         if (tilesMap.has("b"+i)) {
+            // Check if this tile is animating
+            const tilePosition = "b" + i
+            const animationIndex = animatingTiles.indexOf(tilePosition)
+            const isAnimating = animationIndex !== -1
+            const animationDelay = isAnimating ? animationIndex * 150 : 0
+
             let piece = (
                 <Tile
                     letter={tilesMap.get("b"+i)[0]}
@@ -45,6 +51,8 @@ const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchE
                     DragOver={DragOver}
                     Drop={Drop}
                     boardTile= {true}
+                    isAnimating={isAnimating}
+                    animationDelay={animationDelay}
                 />
             )
             let thisSquare = (
