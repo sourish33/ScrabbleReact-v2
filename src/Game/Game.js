@@ -719,7 +719,13 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 clickHandlerExt={clickHandlerExt}
                 handleSubmit={handleExchSubmit}
             />
-            <AIThinkingModal show={showAIThinking} aiSays={aiSays} numWorkersDone = {numWorkersDone}/>
+            <AIThinkingModal
+                show={showAIThinking}
+                aiSays={aiSays}
+                numWorkersDone={numWorkersDone}
+                aiRack={playersAndPoints[gameState.cp]?.rack}
+                tiles={tilesAndBag.tiles}
+            />
             <Container>
                 <Row>
                     <Col sm={12} lg={7} md={12}>

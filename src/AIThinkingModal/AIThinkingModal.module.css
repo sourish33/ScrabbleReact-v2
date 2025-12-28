@@ -22,4 +22,27 @@
     width: 100%;
 }
 
+.rackContainer {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Ensure rack is appropriately sized in modal */
+.rackContainer > div {
+    max-width: 400px;
+    width: 100%;
+}
+
+@media only screen and (max-width: 576px) {
+    .rackContainer > div {
+        max-width: 100%;
+    }
+
+    .rackContainer {
+        margin-bottom: 15px;
+    }
+}
+
 
