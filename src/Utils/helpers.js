@@ -195,7 +195,7 @@ export function arrayToMap(arr) {
         return amap
     }
     for (let el of arr) {
-        amap.set(el.pos, [el.letter, el.points, el.submitted, el.animated])
+        amap.set(el.pos, [el.letter, el.points, el.submitted])
     }
     return amap
 }

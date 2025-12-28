@@ -315,7 +315,6 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 letter: bag[inds[i]][1],
                 points: parseInt(bag[inds[i]][2]),
                 submitted: playersAndPoints[gameState.cp].level > 0,
-                animated: false,
             })
         }
         //update the states
@@ -363,7 +362,6 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                     letter: bag[inds[i]][1],
                     points: parseInt(bag[inds[i]][2]),
                     submitted: playersAndPoints[currentPlayer].level > 0,
-                    animated: false,
                 })
             }
             let newBag = subtractArrays(bag, removeFromBag)
@@ -508,7 +506,6 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                     let tilesNowSubmitted = []
                     for (let tile of tpns) {
                         tile.submitted = true
-                        tile.animated = true
                         tilesNowSubmitted.push(tile)
                     }
                     resolve([
@@ -630,7 +627,6 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         let tilesNowSubmitted = []
         for (let tile of tpns) {
             tile.submitted = true
-            tile.animated = true
             tilesNowSubmitted.push(tile)
         }
         updateTiles([...subtractArrays(tiles, tpns), ...tilesNowSubmitted])
@@ -667,7 +663,6 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 letter: bag[inds[i]][1],
                 points: parseInt(bag[inds[i]][2]),
                 submitted: playersAndPoints[currentPlayer].level > 0,
-                animated: false,
             })
         }
         let newBag = subtractArrays(bag, removeFromBag)

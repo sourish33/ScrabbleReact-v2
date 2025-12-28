@@ -38,7 +38,6 @@ const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchE
                     letter={tilesMap.get("b"+i)[0]}
                     points={tilesMap.get("b"+i)[1]}
                     submitted={!tilesMap.get("b"+i)[2]}
-                    animated={tilesMap.get("b"+i)[3]}
                     TouchStart = {TouchStart}
                     TouchMove = {TouchMove}
                     TouchEnd = {TouchEnd}
