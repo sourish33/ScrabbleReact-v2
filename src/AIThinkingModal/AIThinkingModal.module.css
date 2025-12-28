@@ -11,15 +11,23 @@
 }
 
 .spinnertext{
-    /* width: 100%;
-    font-size: 2em;
-    color: blue; */
-    /* border: 2px solid #888;
-    padding: 5px;
-    border-radius: 10px;
-    background-color: #FF00FF; */
     text-align: center;
     width: 100%;
+}
+
+.rackLabel {
+    width: 100%;
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    padding: 8px 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .rackContainer {
@@ -31,7 +39,7 @@
 
 /* Ensure rack is appropriately sized in modal */
 .rackContainer > div {
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
 }
 

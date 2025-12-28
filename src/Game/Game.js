@@ -747,6 +747,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 aiSays={aiSays}
                 numWorkersDone={numWorkersDone}
                 aiRack={playersAndPoints[gameState.cp]?.rack}
+                aiName={playersAndPoints[gameState.cp]?.name}
                 tiles={tilesAndBag.tiles}
                 tilesToRemove={tilesToRemove}
                 onAnimationComplete={handleAnimationComplete}

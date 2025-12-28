@@ -4,7 +4,7 @@ import { ProgressBar, Spinner } from "react-bootstrap"
 import Rack from "../Rack/Rack"
 import { useState, useEffect, useMemo } from "react"
 
-const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, tiles, tilesToRemove, onAnimationComplete}) => {
+const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, aiName, tiles, tilesToRemove, onAnimationComplete}) => {
     const [removedTiles, setRemovedTiles] = useState([])
 
     // Reset animation state when modal is shown/hidden or when new tiles to remove are provided
@@ -57,19 +57,24 @@ const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, tiles, tilesToRe
             <Modal.Body className={styles.modalbody}>
                 {/* AI's Rack */}
                 {aiRack && displayTiles && (
-                    <div className={styles.rackContainer}>
-                        <Rack
-                            whichRack={aiRack}
-                            tiles={displayTiles}
-                            showTiles={true}
-                            DragStart={null}
-                            DragOver={null}
-                            Drop={null}
-                            TouchStart={null}
-                            TouchMove={null}
-                            TouchEnd={null}
-                        />
-                    </div>
+                    <>
+                        <div className={styles.rackLabel}>
+                            {aiName}'s Rack
+                        </div>
+                        <div className={styles.rackContainer}>
+                            <Rack
+                                whichRack={aiRack}
+                                tiles={displayTiles}
+                                showTiles={true}
+                                DragStart={null}
+                                DragOver={null}
+                                Drop={null}
+                                TouchStart={null}
+                                TouchMove={null}
+                                TouchEnd={null}
+                            />
+                        </div>
+                    </>
                 )}
 
                 {/* Progress bar */}
