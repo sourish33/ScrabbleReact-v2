@@ -731,7 +731,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                     <Col sm={12} lg={7} md={12}>
                         <BoardAndRack
                             tiles={tilesAndBag.tiles}
-                            visibleRack={playersAndPoints[gameState.cp].rack}
+                            visibleRack={AIPlayersExist ? playersAndPoints.find(p => p.level === 0)?.rack : playersAndPoints[gameState.cp].rack}
                             updateTiles={updateTiles}
                             showTiles={gameIsOver? false : !showPassDevice}></BoardAndRack>
                     </Col>
