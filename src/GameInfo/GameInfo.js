@@ -71,17 +71,15 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, 
         })
     }
 
-    const remove = () => {
-        setPlayers((x) => {
-            return x.slice(0, -1)
-        })
+    const remove = (index) => {
+        setPlayers((x) => x.filter((_, i) => i !== index))
     }
 
     const playerform = players.map((el, ind) => {
         let u =
             el.level === 0 ? (
-                <div key={ind} className="row mb-3">
-                    <div className="col-lg-6 col-sm-12 col-md-6">
+                <div key={ind} className="row mb-3 align-items-center">
+                    <div className="col-lg-6 col-sm-10 col-md-6">
                     <input
                         name="Player Name"
                         className="form-control"
@@ -92,24 +90,29 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, 
                         onChange={(e) => handleChange(e, ind)}
                     />
                     </div>
+                    <div className="col-auto">
+                        <span className={styles.deleteIcon} onClick={() => remove(ind)}>&#x1F5D1;</span>
+                    </div>
                 </div>
             ) : (
-                <div key={ind} className="row mb-3">
-                    <div className="col-6">
+                <div key={ind} className="row mb-3 align-items-center">
+                    <div className="col-5">
                         <input value={el.name} type="text" className="form-control" disabled />
                     </div>
-                    <div className={`col-3`}>
+                    <div className="col-3">
                         <select
                             className={styles.select}
                             name="level"
                             onChange={(e) => handleSelect(e, ind)}
                             value={el.level}
-                            
                         >
                             <option key="W" value="1">Weak</option>
                             <option key="M" value="2">Medium</option>
                             <option key="S" value="3">Strong</option>
                         </select>
+                    </div>
+                    <div className="col-auto">
+                        <span className={styles.deleteIcon} onClick={() => remove(ind)}>&#x1F5D1;</span>
                     </div>
                 </div>
             )
@@ -224,12 +227,6 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, 
                     {players.length < MAX_PLAYERS && players.filter(p => p.level > 0).length < MAX_AI_PLAYERS ? (
                         <Button variant="primary" type="button" className={'me-2'} onClick={handleClickAI}>
                             Add Computer
-                        </Button>
-                    ) : null}
-
-                    {players.length !== 0 ? (
-                        <Button variant="primary" type="button" className={'me-2'} onClick={remove}>
-                            Remove
                         </Button>
                     ) : null}
                 </ButtonToolbar>

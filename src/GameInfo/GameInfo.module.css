@@ -31,3 +31,15 @@
     /* margin: 60px auto; */
   }
 
+  .deleteIcon {
+    color: #dc3545;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.15s ease-in-out;
+  }
+
+  .deleteIcon:hover {
+    color: #a71d2a;
+  }
