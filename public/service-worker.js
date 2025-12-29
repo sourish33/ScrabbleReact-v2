@@ -1,7 +1,7 @@
 /* eslint-disable no-restricted-globals */
 
 // Service Worker for Tortoise Scrabble PWA
-const CACHE_NAME = 'tortoise-scrabble-v1';
+const CACHE_NAME = 'tortoise-scrabble-v1.0.0-2025-12-29';
 const urlsToCache = [
   '/',
   '/index.html',
