@@ -59,7 +59,7 @@ const AIThinkingModal = ({show, aiSays, numWorkersDone, aiRack, aiName, tiles, t
                 {aiRack && displayTiles && (
                     <>
                         <div className={styles.rackLabel}>
-                            {aiName}'s Rack
+                            {aiName}'s Tile Rack
                         </div>
                         <div className={styles.rackContainer}>
                             <Rack
