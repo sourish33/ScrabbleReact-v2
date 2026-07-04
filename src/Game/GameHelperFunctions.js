@@ -140,13 +140,6 @@ export const recallTiles = (tiles, rack) => {
     if (unsubmittedTiles.length === 0) {
         return tiles
     }
-    //check for and handle blank tiles
-    for (let tile of unsubmittedTiles) {
-        if (tile.points === 0) {
-            tile.letter = "_"
-        }
-    }
-
     let rackTiles = tilesOnRack(tiles, rack)
 
     if (rackTiles.length === 7) {
@@ -159,11 +152,13 @@ export const recallTiles = (tiles, rack) => {
             "number of tiles on board doesnt match number of empty spots  on rack"
         )
     }
-    //making a copy of boardtiles to for changing positions to the free positions on the rack
-    let returnedTiles = unsubmittedTiles
-    for (let n = 0; n < unsubmittedTiles.length; n++) {
-        returnedTiles[n].pos = freeSlots[n]
-    }
+    //copy the tiles (never mutate React state), moving them to the free rack
+    //slots and resetting any blank tile back to "_"
+    let returnedTiles = unsubmittedTiles.map((tile, n) => ({
+        ...tile,
+        letter: tile.points === 0 ? "_" : tile.letter,
+        pos: freeSlots[n],
+    }))
 
     return [...subtractArrays(tiles, unsubmittedTiles), ...returnedTiles]
 }

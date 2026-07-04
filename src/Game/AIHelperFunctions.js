@@ -304,7 +304,8 @@ export const evaluateMoves = (rackPerms, slots, tiles, rack, cutoff = 50000, toW
                         return
                     }
                     let pts = evaluateMove(rp, s, tiles, rack)
-                    if (pts) {
+                    if (pts !== null) { //null means illegal word; 0 points is still a legal move
+
                         moves.push({
                             rackPerm: rp,
                             slot: s,
@@ -333,7 +334,8 @@ export const evaluateMoves = (rackPerms, slots, tiles, rack, cutoff = 50000, toW
                             letter,
                             tilesMap
                         )
-                        if (pts) {
+                        if (pts !== null) { //null means illegal word; 0 points is still a legal move
+
                             moves.push({
                                 rackPerm: rp,
                                 slot: s,

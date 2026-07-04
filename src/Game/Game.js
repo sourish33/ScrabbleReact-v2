@@ -271,12 +271,13 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
             event.currentTarget.parentNode.parentNode.id[1]
 
         setSelectedTiles((x) => {
-            if (x.has(clickedTileNo)) {
-                x.delete(clickedTileNo)
+            const next = new Set(x)
+            if (next.has(clickedTileNo)) {
+                next.delete(clickedTileNo)
             } else {
-                x.add(clickedTileNo)
+                next.add(clickedTileNo)
             }
-            return x
+            return next
         })
     }
     const exchange = () => {
@@ -291,7 +292,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
             })
             return
         }
-        recallTiles(tiles, playersAndPoints[currentPlayer].rack)
+        updateTiles(recallTiles(tiles, playersAndPoints[currentPlayer].rack))
         setShowEx(true)
     }
     const hideModalEx = () => {
@@ -614,13 +615,11 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                         },
                         ...lastPlayed,
                     ])
-                    //Change the subitted field to true
-
-                    let tilesNowSubmitted = []
-                    for (let tile of tpns) {
-                        tile.submitted = true
-                        tilesNowSubmitted.push(tile)
-                    }
+                    //Change the submitted field to true
+                    let tilesNowSubmitted = tpns.map((tile) => ({
+                        ...tile,
+                        submitted: true,
+                    }))
                     resolve([
                         ...subtractArrays(newTiles, tpns),
                         ...tilesNowSubmitted,
@@ -736,13 +735,11 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
             },
             ...lastPlayed,
         ])
-        //Change the subitted field to true
-
-        let tilesNowSubmitted = []
-        for (let tile of tpns) {
-            tile.submitted = true
-            tilesNowSubmitted.push(tile)
-        }
+        //Change the submitted field to true
+        let tilesNowSubmitted = tpns.map((tile) => ({
+            ...tile,
+            submitted: true,
+        }))
         updateTiles([...subtractArrays(tiles, tpns), ...tilesNowSubmitted])
         let tr = tilesOnRack(tiles, playersAndPoints[currentPlayer].rack)
         if (tr.length === 0) {
