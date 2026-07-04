@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { Col, Container, Row } from "react-bootstrap"
 import Swal from "sweetalert2"
 import BoardAndRack from "../BoardAndRack"
@@ -61,13 +61,14 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     const [tilesToRemove, setTilesToRemove] = useState(null)
     const [pendingAIMove, setPendingAIMove] = useState(null)
     const [animatingTiles, setAnimatingTiles] = useState([])
+    const gaddagWorkerRef = useRef(null)
 
     //parsing incoming data from the welcome page
     const players = gameVariables.players
     const shufflePlayers = gameVariables.shufflePlayers
     const dictChecking = gameVariables.dictCheck === "1" ? true : false
     const maxPoints = parseInt(gameVariables.gameType)
-    const maxSearches = {1: 1500, 2: 60000, 3: 150000}
+    const maxSearches = {1: 1500, 2: 60000, 3: 150000} //level 4 (Genius) uses the GADDAG worker instead of a capped search
     const playerTable = makePlayertable(players, shufflePlayers)
     const numPlayers = playerTable.length
     const AIPlayersExist = playerTable.filter((el) => el.level > 0).length > 0 //whether AI players exist
@@ -414,6 +415,14 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         setShowAIThinking(true)
         setTilesToRemove(null) // Reset animation state
         const { cp: currentPlayer } = gameState
+
+        if (Number(playersAndPoints[currentPlayer].level) === 4) {
+            //Genius level: exhaustive GADDAG search instead of the capped brute-force search
+            callGaddagWorker(theTiles, playersAndPoints[currentPlayer].rack)
+                .then((bestMove) => handleAIMoveFound(bestMove, tilesBagArr, currentPlayer))
+            return
+        }
+
         // makeRackPerms now handles empty/partial racks gracefully
         let [p1, p2, p3, p4, p5, p6, p7] = makeRackPerms(
             theTiles,
@@ -422,19 +431,64 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         let makeVerslots = tilesOnBoard(theTiles).length !== 0 //no need to make vertical slots if the board is empty
         let [s1, s2, s3, s4, s5, s6, s7] = makeAllSlots(theTiles, makeVerslots)
         callAllWorkers([p1, p2, p3, p4, p5, p6, p7], [s1, s2, s3, s4, s5, s6, s7], theTiles, currentPlayer)
-            .then((bestMove)=>{
-                // Store the move and trigger animation
-                setPendingAIMove({bestMove, tilesBagArr, currentPlayer})
-                if (bestMove.length === 0 || !bestMove.rackPerm) {
-                    // No move found, close modal immediately
-                    aiSubmitMove(bestMove, tilesBagArr, currentPlayer)
-                } else {
-                    // Trigger tile removal animation
-                    setTilesToRemove(bestMove.rackPerm)
-                }
-            })
+            .then((bestMove)=> handleAIMoveFound(bestMove, tilesBagArr, currentPlayer))
 
     }
+
+    const handleAIMoveFound = (bestMove, tilesBagArr, currentPlayer) => {
+        // Store the move and trigger animation
+        setPendingAIMove({bestMove, tilesBagArr, currentPlayer})
+        if (bestMove.length === 0 || !bestMove.rackPerm) {
+            // No move found, close modal immediately
+            aiSubmitMove(bestMove, tilesBagArr, currentPlayer)
+        } else {
+            // Trigger tile removal animation
+            setTilesToRemove(bestMove.rackPerm)
+        }
+    }
+
+    const getGaddagWorker = () => {
+        if (!gaddagWorkerRef.current) {
+            gaddagWorkerRef.current = new Worker(new URL('../Workers/gaddagWorker.js', import.meta.url), { type: 'module' })
+        }
+        return gaddagWorkerRef.current
+    }
+
+    function callGaddagWorker(tiles, whichRack) {
+        return new Promise((resolve) => {
+            const worker = getGaddagWorker()
+            setAiSays("")
+            setNumWorkersDone(0)
+            const handler = (message) => {
+                const result = message.data
+                if (typeof result === 'string') {
+                    setAiSays(result)
+                    return
+                }
+                if (result && result.type === 'gaddagResult') {
+                    worker.removeEventListener('message', handler)
+                    setNumWorkersDone(7)
+                    resolve(result.best)
+                }
+            }
+            worker.addEventListener('message', handler)
+            worker.postMessage({ type: 'gaddagMove', tiles, whichRack })
+        })
+    }
+
+    useEffect(() => {
+        //build the GADDAG in the background at game start so a Genius AI's first move is fast
+        if (playersAndPoints.some((p) => Number(p.level) === 4)) {
+            getGaddagWorker().postMessage({ type: 'warmup' })
+        }
+        return () => {
+            if (gaddagWorkerRef.current) {
+                gaddagWorkerRef.current.terminate()
+                gaddagWorkerRef.current = null
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [])
 
 
 

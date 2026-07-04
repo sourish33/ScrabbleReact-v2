@@ -9,7 +9,7 @@ import styles from "./GameInfo.module.css"
 // Game configuration - adjust these values to change game limits
 const MAX_PLAYERS = 2;        // Maximum total number of players (humans + AI)
 const MAX_AI_PLAYERS = 1;     // Maximum number of AI players allowed
-const DEFAULT_AI_LEVEL = 2;   // Default AI difficulty: 1=Weak, 2=Medium, 3=Strong
+const DEFAULT_AI_LEVEL = 2;   // Default AI difficulty: 1=Weak, 2=Medium, 3=Strong, 4=Genius
 
 const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, onDiscardGame }) => {
 
@@ -109,6 +109,7 @@ const GameInfo = ({ handleSubmit, hasSavedGame, savedPlayerNames, onResumeGame, 
                             <option key="W" value="1">Weak</option>
                             <option key="M" value="2">Medium</option>
                             <option key="S" value="3">Strong</option>
+                            <option key="G" value="4">Genius</option>
                         </select>
                     </div>
                     <div className="col-auto">

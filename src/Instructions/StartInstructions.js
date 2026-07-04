@@ -19,6 +19,7 @@ const StartInstructions = () => {
                   <li><strong>Weak:</strong> Fast moves, easier to beat</li>
                   <li><strong>Medium:</strong> Balanced challenge (recommended)</li>
                   <li><strong>Strong:</strong> Takes more time to think, harder to beat</li>
+                  <li><strong>Genius:</strong> Considers every possible move and always plays the best one</li>
                 </ul>
               </li>
             </ul>
