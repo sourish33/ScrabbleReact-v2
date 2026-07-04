@@ -16,6 +16,19 @@ const Tile = (props) => {
         }
     }
 
+    const isBlank = props.points === 0
+    if (isBlank) {
+        classes = `${classes} ${styles.blankTile}`
+    }
+    if (props.isSelected) {
+        classes = `${classes} ${styles.selectedTile}`
+    }
+
+    let letterClass = props.boardTile ? styles.letter : styles.letterOnRack
+    if (isBlank) {
+        letterClass = `${letterClass} ${styles.blankLetter}`
+    }
+
     return (
         <div
             draggable={props.submitted}
@@ -28,7 +41,7 @@ const Tile = (props) => {
             onDragOver={props.submitted ? props.DragOver: null}
             onDrop={props.submitted ? props.Drop: null}
         >
-            <div className={props.boardTile? styles.letter: styles.letterOnRack}>{props.letter}</div>
+            <div className={letterClass}>{props.letter}</div>
             <div className={props.boardTile? styles.points: styles.pointsOnRack}>{props.points}</div>
         </div>
 

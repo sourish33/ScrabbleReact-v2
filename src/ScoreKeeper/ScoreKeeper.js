@@ -4,6 +4,7 @@ import { Table, Button} from "react-bootstrap"
 import Swal from "sweetalert2"
 import ButtonContent from "../UI/ButtonContent/ButtonContent"
 import TortoiseLogo from "../components/TortoiseLogo"
+import TileTracker from "../TileTracker/TileTracker"
 import { DefModal } from "./DefModal"
 import styles from "./ScoreKeeper.module.css"
 
@@ -174,6 +175,12 @@ const ScoreKeeper = (props) => {
                     tilesLeft={props.tilesLeft}
                     maxPoints={props.maxPoints}
                     dictChecking={props.dictChecking}
+                />
+            </div>
+            <div className="p-1 mb-2 justify-content-center">
+                <TileTracker
+                    tiles={props.tiles}
+                    visibleRack={props.visibleRack}
                 />
             </div>
             <div className="p-1 mb-2 justify-content-center">

@@ -1,4 +1,4 @@
-import React  from "react"
+import React, { useEffect, useState } from "react"
 import Board from "./Board/Board"
 import styles from "./BoardAndRack.module.css"
 
@@ -8,10 +8,13 @@ import {
     getXY,
     setTranslate,
 } from "./Utils/dragndropHelpers"
+import { formcheck } from "./Utils/helpers"
 import Rack from "./Rack/Rack"
 
 const BoardAndRack = ({ tiles, visibleRack, updateTiles, showTiles, animatingTiles }) => {
-    
+    //click-to-place: pos of the currently selected tile ("p3", "b112", ...) or null
+    const [selectedPos, setSelectedPos] = useState(null)
+
 
     let startingloc = ""
     let endingloc = ""
@@ -35,18 +38,67 @@ const BoardAndRack = ({ tiles, visibleRack, updateTiles, showTiles, animatingTil
         event.preventDefault()
     }
 
-    const Drop = (event) => {
+    const Drop = async (event) => {
         event.preventDefault()
         let incoming = event.dataTransfer.getData("text")
         let u = event.currentTarget
         let dest = getSquareIdFromPos(getXY(u))
-        let newTiles = move(incoming, dest, tiles)
+        let newTiles = await move(incoming, dest, tiles)
         if (newTiles === null) {
             console.log("null newTiles")
             return
         }
+        setSelectedPos(null)
         updateTiles(newTiles)
     }
+
+    //returns true if the tile at pos can be picked up by the current (human) player
+    const isMovable = (pos) => {
+        const tile = tiles.find((el) => el.pos === pos)
+        if (!tile) {
+            return false
+        }
+        return pos[0] === "b" ? !tile.submitted : pos[0] === visibleRack
+    }
+
+    const handleClick = async (event) => {
+        if (!showTiles) {
+            return
+        }
+        const square = event.target.closest("[id]")
+        if (!square || !formcheck(square.id)) {
+            return
+        }
+        const pos = square.id
+        if (selectedPos === null) {
+            if (isMovable(pos)) {
+                setSelectedPos(pos)
+            }
+            return
+        }
+        if (selectedPos === pos) {
+            setSelectedPos(null)
+            return
+        }
+        const newTiles = await move(selectedPos, pos, tiles)
+        setSelectedPos(null)
+        if (newTiles !== null) {
+            updateTiles(newTiles)
+        } else if (isMovable(pos)) {
+            //invalid destination but a valid tile: switch the selection to it
+            setSelectedPos(pos)
+        }
+    }
+
+    useEffect(() => {
+        const onKeyDown = (e) => {
+            if (e.key === "Escape") {
+                setSelectedPos(null)
+            }
+        }
+        document.addEventListener("keydown", onKeyDown)
+        return () => document.removeEventListener("keydown", onKeyDown)
+    }, [])
 
     const TouchStart = (e) => {
         e.stopPropagation()
@@ -93,18 +145,37 @@ const BoardAndRack = ({ tiles, visibleRack, updateTiles, showTiles, animatingTil
         xOffset = 0
         yOffset = 0
 
-        let newTiles = move(startingloc, endingloc, tiles)
-        if (newTiles === null) {
-            if(lastMoved) {
+        if (startingloc === endingloc) {
+            //a tap rather than a drag: treat it like a click (select/deselect/place)
+            if (lastMoved) {
                 lastMoved.style.transform = "none"
             }
-            console.log("null newTiles")
+            if (selectedPos && selectedPos !== startingloc) {
+                move(selectedPos, startingloc, tiles).then((newTiles) => {
+                    setSelectedPos(null)
+                    if (newTiles !== null) {
+                        updateTiles(newTiles)
+                    } else {
+                        setSelectedPos(startingloc)
+                    }
+                })
+                return
+            }
+            setSelectedPos((prev) => (prev === startingloc ? null : startingloc))
             return
         }
-        lastMoved.style.transform = "none"
-        updateTiles(newTiles)
-        
-        
+        move(startingloc, endingloc, tiles).then((newTiles) => {
+            if (newTiles === null) {
+                if(lastMoved) {
+                    lastMoved.style.transform = "none"
+                }
+                console.log("null newTiles")
+                return
+            }
+            lastMoved.style.transform = "none"
+            setSelectedPos(null)
+            updateTiles(newTiles)
+        })
     }
 
     function disableScroll() {
@@ -122,7 +193,7 @@ const BoardAndRack = ({ tiles, visibleRack, updateTiles, showTiles, animatingTil
 
 
     return (
-        <div className ={styles.center}>
+        <div className ={styles.center} onClick={handleClick}>
             <Board
                 tiles={tiles}
                 DragStart={DragStart}
@@ -132,6 +203,7 @@ const BoardAndRack = ({ tiles, visibleRack, updateTiles, showTiles, animatingTil
                 TouchMove={TouchMove}
                 TouchEnd={TouchEnd}
                 animatingTiles={animatingTiles}
+                selectedPos={selectedPos}
             />
             <Rack
                 whichRack={visibleRack}
@@ -143,6 +215,7 @@ const BoardAndRack = ({ tiles, visibleRack, updateTiles, showTiles, animatingTil
                 TouchMove={TouchMove}
                 TouchEnd={TouchEnd}
                 showTiles={showTiles}
+                selectedPos={selectedPos}
             />
         </div>
     )

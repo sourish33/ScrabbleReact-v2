@@ -1,6 +1,41 @@
-// import Swal from "sweetalert2"
+import Swal from "sweetalert2"
 import { changeLetter, readPoints } from "../Game/GameHelperFunctions"
-import { emptySpot, formcheck, isLetter } from "./helpers"
+import { emptySpot, formcheck } from "./helpers"
+
+export function pickBlankLetter() {
+    //shows a letter-grid picker for a blank tile; resolves to the chosen
+    //letter, or null if the player dismisses the dialog
+    const letters = Array.from("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+    const buttonStyle =
+        "padding:8px 0;font-weight:bold;background:rgb(252,252,191);" +
+        "border:1px solid #999;border-radius:5px;font-size:18px;cursor:pointer;"
+    const grid =
+        '<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:6px;">' +
+        letters
+            .map(
+                (l) =>
+                    `<button type="button" data-blank-letter="${l}" style="${buttonStyle}">${l}</button>`
+            )
+            .join("") +
+        "</div>"
+    return new Promise((resolve) => {
+        let picked = null
+        Swal.fire({
+            title: "Choose a letter for the blank tile",
+            html: grid,
+            showConfirmButton: false,
+            showCloseButton: true,
+            didOpen: (popup) => {
+                popup.querySelectorAll("[data-blank-letter]").forEach((btn) => {
+                    btn.addEventListener("click", () => {
+                        picked = btn.getAttribute("data-blank-letter")
+                        Swal.close()
+                    })
+                })
+            },
+        }).then(() => resolve(picked))
+    })
+}
 
 const moveType = (orig, dest)=>{
     let fromRack=false
@@ -15,7 +50,7 @@ const moveType = (orig, dest)=>{
   
   }
 
-const move = (origin, destination, arr) => {
+const move = async (origin, destination, arr) => {
     let tiles = JSON.parse(JSON.stringify(arr))
     if (!formcheck(origin)) {
         //checking origin
@@ -66,19 +101,11 @@ const move = (origin, destination, arr) => {
     }
 
     if (fromRack && toBoard && readPoints(origin, tiles)===0 ) {
-        // Swal.fire({
-        //     icon: 'question',
-        //     text: "Moving an empty tile to the board huh?",
-        //   })
-        let newLetter = prompt("Please choose a letter for this tile:", "")
-        if (newLetter == null || newLetter === "") {
+        let newLetter = await pickBlankLetter()
+        if (newLetter === null) {
             return null
         }
-        newLetter = newLetter.charAt(0)
-        if (!isLetter(newLetter)) {
-            return null
-        }
-        tiles = changeLetter(origin, newLetter.toUpperCase(), tiles)
+        tiles = changeLetter(origin, newLetter, tiles)
     }
 
     if (fromBoard && toRack && readPoints(origin, tiles)===0 ) {

@@ -8,6 +8,7 @@ import {
     coords,
     coordsTolocWordArr,
     getConsecutivesNums,
+    getUniqueInts0,
     getUniques,
     intersection,
     loc,
@@ -375,6 +376,40 @@ function scoreWord(word, tiles){
   }
 
   
+export function exchangeTiles(tiles, bag, tilesToReturn, submitted) {
+    //returns tilesToReturn to the bag and draws the same number of
+    //replacements into the vacated positions; returns [newTiles, newBag]
+    let tilesRemoved = subtractArrays(tiles, tilesToReturn)
+
+    //assign unused serial numbers to the returned tiles before adding them to the bag
+    let srls = Array.from({ length: 100 }, (x, i) => i + 1)
+    let usedSrls = bag.map((el) => el[0])
+    let unusedSrls = subtractArrays(srls, usedSrls)
+    let bagTiles = tilesToReturn.map((tile, i) => [
+        unusedSrls[i],
+        tile.letter,
+        tile.points,
+    ])
+    let addToBag = [...bag, ...bagTiles]
+
+    //draw replacements from the original bag so a returned tile can't be redrawn
+    let removeFromBag = []
+    let addToTiles = []
+    let inds = getUniqueInts0(tilesToReturn.length, bag.length)
+    for (let i = 0; i < tilesToReturn.length; i++) {
+        removeFromBag.push(bag[inds[i]])
+        addToTiles.push({
+            pos: tilesToReturn[i].pos,
+            letter: bag[inds[i]][1],
+            points: parseInt(bag[inds[i]][2]),
+            submitted,
+        })
+    }
+    let newBag = subtractArrays(addToBag, removeFromBag)
+    let newTiles = [...tilesRemoved, ...addToTiles]
+    return [newTiles, newBag]
+}
+
 export function rackPoints(rack, tiles) {
     //adds up the points for the tiles on the rack, "rack"
     let rackTiles=tiles.filter((el)=>el.pos[0]===rack)

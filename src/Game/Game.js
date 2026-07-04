@@ -12,6 +12,7 @@ import {
 import {
     checkLegalPlacement,
     emptyOnRack,
+    exchangeTiles,
     getAllNewWords,
     pickDisplayWord,
     rackPoints,
@@ -62,6 +63,9 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     const [pendingAIMove, setPendingAIMove] = useState(null)
     const [animatingTiles, setAnimatingTiles] = useState([])
     const gaddagWorkerRef = useRef(null)
+    //persistent pool of 7 search workers (one per word length) reused across AI
+    //turns, so the dictionary is only parsed once per worker instead of every turn
+    const workerPoolRef = useRef([])
 
     //parsing incoming data from the welcome page
     const players = gameVariables.players
@@ -69,6 +73,22 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     const dictChecking = gameVariables.dictCheck === "1" ? true : false
     const maxPoints = parseInt(gameVariables.gameType)
     const maxSearches = {1: 1500, 2: 60000, 3: 150000} //level 4 (Genius) uses the GADDAG worker instead of a capped search
+    //instead of always playing the strongest move found, levels 1-3 pick a move
+    //from a strength band (1.0 = best move found) so they feel more human
+    const difficultyBands = {1: [0.4, 0.75], 2: [0.65, 0.92], 3: [0.88, 1.0]}
+
+    const pickMoveForLevel = (sortedMoves, level) => {
+        //sortedMoves is sorted by points, best first
+        const band = difficultyBands[level]
+        if (!band || sortedMoves.length === 0) {
+            return sortedMoves[0] || []
+        }
+        const lastInd = sortedMoves.length - 1
+        const [lo, hi] = band
+        const start = Math.floor((1 - hi) * lastInd)
+        const end = Math.floor((1 - lo) * lastInd)
+        return sortedMoves[start + randomUpTo(Math.max(end - start, 0))]
+    }
     const playerTable = makePlayertable(players, shufflePlayers)
     const numPlayers = playerTable.length
     const AIPlayersExist = playerTable.filter((el) => el.level > 0).length > 0 //whether AI players exist
@@ -321,41 +341,12 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         //get rid of the modal
         hideModalEx()
         setGreeting("Better Luck Next Time!")
-        //get the tiles that would remain after deleting tilesTo Return
-        let tilesRemoved = subtractArrays(tiles, tilesToReturn)
-
-        //assign serial numbers to these tiles before adding them to the bag
-        let srls = Array.from({ length: 100 }, (x, i) => i + 1)
-        let usedSrls = bag.map((el) => el[0])
-        let unusedSrls = subtractArrays(srls, usedSrls)
-
-        let bagTiles = []
-        for (let i = 0; i < tilesToReturn.length; i++) {
-            bagTiles.push([
-                unusedSrls[i],
-                tilesToReturn[i].letter,
-                tilesToReturn[i].points,
-            ])
-        }
-        //this would be the state of the bag after adding the returned tiles to it
-        let addToBag = [...bag, ...bagTiles]
-
-        //now replenishing the array. Create a list of tiles to remove from the bag
-        let removeFromBag = []
-        let addToTiles = []
-        let inds = getUniqueInts0(toReturn.length, bag.length)
-        for (let i = 0; i < toReturn.length; i++) {
-            removeFromBag.push(bag[inds[i]])
-            addToTiles.push({
-                pos: toReturn[i],
-                letter: bag[inds[i]][1],
-                points: parseInt(bag[inds[i]][2]),
-                submitted: playersAndPoints[gameState.cp].level > 0,
-            })
-        }
-        //update the states
-        let newBag = subtractArrays(addToBag, removeFromBag)
-        let newTiles = [...tilesRemoved, ...addToTiles]
+        const [newTiles, newBag] = exchangeTiles(
+            tiles,
+            bag,
+            tilesToReturn,
+            playersAndPoints[gameState.cp].level > 0
+        )
         updateTilesAndBag(newTiles, newBag)
         const { cp: currentPlayer } = gameState
         setLastPlayed([
@@ -384,7 +375,8 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 playersAndPoints[currentPlayer].rack
             )
             if (freeSlots.length === 0) {
-                resolve(tiles)
+                //rack already full (e.g. the previous turn was a pass/exchange)
+                resolve([tiles, bag])
                 return
             }
             let removeFromBag = []
@@ -482,11 +474,20 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         if (playersAndPoints.some((p) => Number(p.level) === 4)) {
             getGaddagWorker().postMessage({ type: 'warmup' })
         }
+        //spin up the search worker pool at game start so each worker parses the
+        //dictionary before the first AI turn instead of during it
+        if (playersAndPoints.some((p) => [1, 2, 3].includes(Number(p.level)))) {
+            for (let i = 0; i < 7; i++) {
+                getPoolWorker(i)
+            }
+        }
         return () => {
             if (gaddagWorkerRef.current) {
                 gaddagWorkerRef.current.terminate()
                 gaddagWorkerRef.current = null
             }
+            workerPoolRef.current.forEach((w) => w && w.terminate())
+            workerPoolRef.current = []
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
@@ -501,21 +502,29 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         })
     }
 
-    function callWorker(perms, slots, tiles, whichRack, cutoff, toWin, verbose=true) {
+    const getPoolWorker = (i) => {
+        if (!workerPoolRef.current[i]) {
+            workerPoolRef.current[i] = new Worker(new URL('../Workers/worker.js', import.meta.url), { type: 'module' })
+        }
+        return workerPoolRef.current[i]
+    }
+
+    function callWorker(workerInd, perms, slots, tiles, whichRack, cutoff, toWin, verbose=true) {
         return new Promise((resolve, reject) => {
-            const myWorker = new Worker(new URL('../Workers/worker.js', import.meta.url), { type: 'module' })
+            const myWorker = getPoolWorker(workerInd)
             setAiSays("")
-            myWorker.addEventListener('message', (message) => {
+            const handler = (message) => {
                 let result = message.data
                 if (typeof(result)==='string'){
                     setAiSays(message.data)
                 }
                 if (Array.isArray(result)){
+                    myWorker.removeEventListener('message', handler)
                     setNumWorkersDone(x=>x+1)
                     resolve(result)
-                    myWorker.terminate()
                 }
-            })
+            }
+            myWorker.addEventListener('message', handler)
 
             myWorker.postMessage({
                 type: 'crunch',
@@ -536,7 +545,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         let moves = []
         let bestMove = {points: -1}
         for (let i =0; i<7; i++){
-            moves = await callWorker(allPerms[i], allSlots[i], tiles, whichRack, cutoff, toWin)
+            moves = await callWorker(i, allPerms[i], allSlots[i], tiles, whichRack, cutoff, toWin)
             if (moves.length===0){continue}
             moves.sort((x, y) => y.points - x.points)
             if (moves[0].points > bestMove.points){
@@ -557,7 +566,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         }
         let promises = []
         for (let i=0;i<7;i++){
-            promises.push(callWorker(allPerms[i], allSlots[i], tiles, whichRack, cutoff, toWin))
+            promises.push(callWorker(i, allPerms[i], allSlots[i], tiles, whichRack, cutoff, toWin))
         }
         let moves = await Promise.all(promises)
         moves = moves.reduce((previousValue, currentValue) => [...previousValue, ...currentValue])
@@ -565,8 +574,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
             return []
         }
         moves.sort((x, y) => y.points - x.points)
-        const bestMove = moves[0]
-        return bestMove
+        return pickMoveForLevel(moves, Number(playersAndPoints[currentPlayer].level))
     }
 
     // Callback when animation completes
@@ -579,11 +587,48 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
         }
     }
 
+    const aiExchange = (theTiles, theBag, currentPlayer) => {
+        const rackTiles = tilesOnRack(theTiles, playersAndPoints[currentPlayer].rack)
+        const [newTiles, newBag] = exchangeTiles(theTiles, theBag, rackTiles, true)
+        updateTilesAndBag(newTiles, newBag)
+        setLastPlayed([
+            {
+                player: playersAndPoints[currentPlayer].name,
+                word: "Exchanged",
+                points: 0,
+            },
+            ...lastPlayed,
+        ])
+        advanceGameState()
+    }
+
+    const aiShouldExchange = (theTiles, theBag, currentPlayer) => {
+        //exchange rules: at least 7 tiles must be in the bag, there must be
+        //tiles on the rack, and the AI's previous action must not also have
+        //been an exchange (prevents two stuck AIs trading tiles forever)
+        if (theBag.length < 7) {
+            return false
+        }
+        if (tilesOnRack(theTiles, playersAndPoints[currentPlayer].rack).length === 0) {
+            return false
+        }
+        const lastAction = lastPlayed.find(
+            (el) => el.player === playersAndPoints[currentPlayer].name
+        )
+        return !(lastAction && lastAction.word === "Exchanged")
+    }
+
     const aiSubmitMove = (bestMove, tilesBagArr, currentPlayer) =>{
         setShowAIThinking(false)
         if (bestMove.length===0){
-            console.log("No moves found - AI passing turn")
-            // Delay before passing to allow UI update and prevent infinite loop
+            const [theTiles, theBag] = tilesBagArr
+            // Delay before acting to allow UI update and prevent infinite loop
+            if (aiShouldExchange(theTiles, theBag, currentPlayer)) {
+                setTimeout(() => {
+                    aiExchange(theTiles, theBag, currentPlayer)
+                }, 1000)
+                return
+            }
             setTimeout(() => {
                 passTurn()
             }, 1000)
@@ -612,6 +657,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                             player: playersAndPoints[currentPlayer].name,
                             word: readWord(pickDisplayWord(newWords, tpns), newTiles),
                             points: aiScore,
+                            bingo: tpns.length === 7,
                         },
                         ...lastPlayed,
                     ])
@@ -732,6 +778,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 player: playersAndPoints[currentPlayer].name,
                 word: readWord(pickDisplayWord(newWords, tpns), tiles),
                 points: pointsPossible,
+                bingo: tpns.length === 7,
             },
             ...lastPlayed,
         ])
@@ -796,8 +843,14 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     }
 
 
+    //the rack visible to the person holding the device: the human's rack in AI
+    //games, the current player's rack in pass-and-play games
+    const visibleRack = AIPlayersExist
+        ? playersAndPoints.find((p) => p.level === 0)?.rack
+        : playersAndPoints[gameState.cp].rack
+
     return (
-        <>  
+        <>
             <Instructions
                 show={showInstr}
                 onHide = {hideInstructions}
@@ -807,6 +860,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                 show={showVictoryBox}
                 winner={theWinner()}
                 onClickClose={hideModalVictory}
+                lastPlayed={lastPlayed}
             />
             <PassDeviceMessageModal
                 show={showPassDevice}
@@ -845,7 +899,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                     <Col sm={12} lg={7} md={12}>
                         <BoardAndRack
                             tiles={tilesAndBag.tiles}
-                            visibleRack={AIPlayersExist ? playersAndPoints.find(p => p.level === 0)?.rack : playersAndPoints[gameState.cp].rack}
+                            visibleRack={visibleRack}
                             updateTiles={updateTiles}
                             showTiles={gameIsOver? false : !showPassDevice}
                             animatingTiles={animatingTiles}></BoardAndRack>
@@ -866,6 +920,8 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
                             pointsPossible={pointsPossible}
                             playersAndPoints={playersAndPoints}
                             currentPlayer={gameState.cp}
+                            tiles={tilesAndBag.tiles}
+                            visibleRack={visibleRack}
                             tilesLeft={tilesAndBag.bag.length}
                             maxPoints={maxPoints}
                             lastPlayed={lastPlayed}

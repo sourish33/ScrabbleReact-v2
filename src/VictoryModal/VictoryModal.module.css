@@ -22,7 +22,19 @@
   } 
 
   .victory {
-    border: 2px solid blue; 
+    border: 2px solid blue;
     background-color: #107896;
     color: white;
+  }
+
+  .stats {
+    padding: 6px 12px;
+    background-color: #eafff5;
+    border-bottom: 2px solid #107896;
+    text-align: center;
+  }
+
+  .statLine {
+    margin: 2px 0;
+    font-size: 15px;
   }

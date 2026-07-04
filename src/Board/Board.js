@@ -27,7 +27,7 @@ const renderSquare = (i, piece = null) => {
     return <Square bgd={whichBgd}>{piece}</Square>
 }
 
-const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchEnd, animatingTiles = [] }) => {
+const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchEnd, animatingTiles = [], selectedPos = null }) => {
     let tilesMap = arrayToMap(tiles)
 
     const squares = []
@@ -53,6 +53,7 @@ const Board = ({ tiles, DragStart, DragOver, Drop, TouchStart, TouchMove, TouchE
                     boardTile= {true}
                     isAnimating={isAnimating}
                     animationDelay={animationDelay}
+                    isSelected={selectedPos === tilePosition}
                 />
             )
             let thisSquare = (
