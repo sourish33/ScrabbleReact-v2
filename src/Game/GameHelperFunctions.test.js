@@ -147,11 +147,47 @@ describe('GameHelperFunctions', () => {
             expect(typeof result).toBe('number')
         })
 
-        it('should return 50 for empty tiles (bingo bonus)', () => {
-            // When no tiles are passed, tilesOnRack returns empty array
-            // which triggers the bingo bonus (all 7 tiles used)
+        it('should not award bingo bonus for empty tiles', () => {
+            // Bingo requires exactly 7 tiles played this turn
             const result = score([], 'p')
-            expect(result).toBe(50)
+            expect(result).toBe(0)
+        })
+
+        it('should award bingo bonus only when exactly 7 tiles are played', () => {
+            // 7 unsubmitted tiles in row 8, cols 2-8 (locs 106-112)
+            // includes DL at loc(8,4)=108 and center star (DW) at 112
+            const sevenTiles = Array.from({ length: 7 }, (x, i) => ({
+                pos: 'b' + (106 + i),
+                letter: 'A',
+                points: 1,
+                submitted: false,
+            }))
+            // base: 7 letters + 1 extra from DL = 8, center star doubles: 16, bingo: +50
+            expect(score(sevenTiles, 'p')).toBe(66)
+        })
+
+        it('should not award bingo bonus when fewer than 7 tiles empty the rack', () => {
+            // 3 unsubmitted tiles on neutral squares in row 2, cols 7-9 (locs 21-23)
+            const threeTiles = [
+                { pos: 'b21', letter: 'A', points: 1, submitted: false },
+                { pos: 'b22', letter: 'B', points: 1, submitted: false },
+                { pos: 'b23', letter: 'C', points: 1, submitted: false },
+            ]
+            // rack 'p' is empty but only 3 tiles were played: no bingo
+            expect(score(threeTiles, 'p')).toBe(3)
+        })
+
+        it('should compound multiple triple-word squares (triple-triple = x9)', () => {
+            // 8 unsubmitted tiles in row 1, cols 1-8 (locs 0-7)
+            // covers TWs at loc(1,1)=0 and loc(1,8)=7, and DL at loc(1,4)=3
+            const eightTiles = Array.from({ length: 8 }, (x, i) => ({
+                pos: 'b' + i,
+                letter: 'A',
+                points: 1,
+                submitted: false,
+            }))
+            // base: 8 letters + 1 extra from DL = 9, two TWs: 9 * 3 * 3 = 81
+            expect(score(eightTiles, 'p')).toBe(81)
         })
     })
 

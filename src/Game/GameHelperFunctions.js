@@ -362,24 +362,19 @@ function scoreWord(word, tiles){
         sum += points
       }
     }
-    if (doublers>0) {
-      sum = sum*2*doublers
-    }
-    if (triplers>0) {
-      sum = sum*3*triplers
-    }
+    //word multipliers compound: two DWs = x4, two TWs = x9, three TWs = x27
+    sum = sum * 2**doublers * 3**triplers
     return sum
-  }  
-  
+  }
+
   export function score(tiles, visibleRack) {
     let newWords = getAllNewWords(tiles)
     let score = 0
     for (let word of newWords){
       score += scoreWord(word, tiles)
     }
-    let tr = tilesOnRack(tiles, visibleRack)
-    if (tr.length ===0) {
-      score += 50 //bingo
+    if (tilesPlayedNotSubmitted(tiles).length === 7) {
+      score += 50 //bingo: all 7 rack tiles played in one turn
     }
     return score
   }

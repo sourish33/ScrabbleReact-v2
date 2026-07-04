@@ -8,22 +8,20 @@
     "react-bootstrap": "^2.0.0",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.11.0",
-    "react-scripts": "5.0.0",
     "sweetalert2": "^11.1.0"
   },
   "scripts": {
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject",
+    "dev": "vite",
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "process-dictionary": "node scripts/processDictionary.js",
     "update-sw-version": "node scripts/updateServiceWorkerVersion.js",
     "prebuild": "npm run process-dictionary && npm run update-sw-version"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -38,6 +36,10 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^3.2.3"
+    "@vitejs/plugin-react": "^4.3.4",
+    "gh-pages": "^3.2.3",
+    "jsdom": "^25.0.1",
+    "vite": "^5.4.11",
+    "vitest": "^1.6.0"
   }
 }

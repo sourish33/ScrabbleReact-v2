@@ -198,6 +198,28 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
             return true
         }
         ///////
+        // Game ends when every player has passed twice in a row
+        // (prevents endless pass loops, e.g. two AIs with no moves)
+        const passesNeeded = 2 * numPlayers
+        if (
+            lastPlayed.length >= passesNeeded &&
+            lastPlayed.slice(0, passesNeeded).every((el) => el.word === "Passed")
+        ) {
+            // No one went out: each player loses the value of their own rack
+            let playersAndPointsCopy = Array.from(playersAndPoints)
+            for (let i = 0; i < playersAndPointsCopy.length; i++) {
+                playersAndPointsCopy[i].points -= rackPoints(
+                    playersAndPointsCopy[i].rack,
+                    tiles
+                )
+            }
+            setPlayersAndPoints(playersAndPointsCopy)
+            setShowVictoryBox((x) => true)
+            setButtonsDisabled((x) => true)
+            setGameIsOver(true)
+            return true
+        }
+        ///////
         // Game ends when bag is empty AND at least one player has emptied their rack
         if (bag.length === 0) {
             // Check if any player has an empty rack
@@ -258,7 +280,16 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
     }
     const exchange = () => {
         const { cp: currentPlayer } = gameState
-        const {tiles} = tilesAndBag
+        const {tiles, bag} = tilesAndBag
+        if (bag.length < 7) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Cannot Exchange',
+                text: 'Exchanging tiles requires at least 7 tiles left in the bag',
+                footer: '<a href="https://scrabble.hasbro.com/en-us/rules">Scrabble Rules</a>'
+            })
+            return
+        }
         recallTiles(tiles, playersAndPoints[currentPlayer].rack)
         setShowEx(true)
     }
@@ -417,7 +448,7 @@ const Game = ({ gameVariables, exitGame, saveAndExit }) => {
 
     function callWorker(perms, slots, tiles, whichRack, cutoff, toWin, verbose=true) {
         return new Promise((resolve, reject) => {
-            const myWorker = new Worker(new URL('../Workers/worker.js', import.meta.url))
+            const myWorker = new Worker(new URL('../Workers/worker.js', import.meta.url), { type: 'module' })
             setAiSays("")
             myWorker.addEventListener('message', (message) => {
                 let result = message.data
