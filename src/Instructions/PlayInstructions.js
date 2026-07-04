@@ -12,8 +12,8 @@ const PlayInstructions = () => {
             <div className={styles.section}>
                 <div className={styles.sectionTitle}>Game Basics</div>
                 <ul>
-                    <li>Drag and drop tiles with your mouse or touch to move them around</li>
-                    <li>The current player's turn is shown in a <span className={styles.highlight}>highlighted</span> header at the top</li>
+                    <li><strong>Click-to-place:</strong> Click a tile on your rack to select it (blue ring shows selection), then click a board square to place it. Click the selected tile again or press <kbd>Esc</kbd> to deselect. You can also drag and drop instead.</li>
+                    <li>The current player's turn is shown in the scoreboard with a <span className={styles.highlight}>yellow highlight</span> and a ► arrow</li>
                     <li><span className={styles.infobox}>Points Possible</span> displays the points you could earn if your words are valid</li>
                 </ul>
             </div>
@@ -43,6 +43,22 @@ const PlayInstructions = () => {
             </div>
 
             <div className={styles.section}>
+                <div className={styles.sectionTitle}>Blank Tiles</div>
+                <ul>
+                    <li>When you move a blank tile (worth 0 points) from your rack to the board, a letter-picker will appear</li>
+                    <li>Choose the letter you want the blank to represent for this turn</li>
+                    <li>Blank tiles display with a lighter appearance so you remember they're wildcards</li>
+                </ul>
+            </div>
+
+            <div className={styles.section}>
+                <div className={styles.sectionTitle}>Tile Tracker</div>
+                <p>
+                    The <span className={styles.infobox}>Tile Tracker</span> on the right shows how many of each letter remain unseen (in the bag or on opponents' racks). Click the button to expand/collapse. This is perfect for serious players who like to track what's still out there!
+                </p>
+            </div>
+
+            <div className={styles.section}>
                 <div className={styles.sectionTitle}>Dictionary & Validity</div>
                 <p>
                     All words played by the AI are guaranteed to be valid according to the{" "}
@@ -55,6 +71,32 @@ const PlayInstructions = () => {
                         Collins Scrabble Dictionary
                     </a>.
                     When dictionary checking is enabled, your words will be validated against this same dictionary.
+                </p>
+            </div>
+
+            <div className={styles.section}>
+                <div className={styles.sectionTitle}>How Games End</div>
+                <ul>
+                    <li><strong>Reach the point goal:</strong> First player to reach 75, 150, or the custom goal wins immediately</li>
+                    <li><strong>Everyone passes twice:</strong> If all players pass twice in a row with no plays, the game ends. Each player loses the value of their remaining rack tiles.</li>
+                    <li><strong>Bag runs out:</strong> When all tiles are drawn and one player empties their rack, they win and collect points from all other players' remaining tiles</li>
+                    <li><strong>Bingo bonus:</strong> Playing all 7 of your rack tiles in a single turn earns a 50-point bonus!</li>
+                </ul>
+            </div>
+
+            <div className={styles.section}>
+                <div className={styles.sectionTitle}>Exchanging Tiles</div>
+                <ul>
+                    <li>Click <span className={styles.infobox}>Exch</span> to swap tiles: select any tiles from your rack and they will be replaced with random tiles from the bag</li>
+                    <li><strong>Exchange requires at least 7 tiles remaining in the bag</strong> — if fewer tiles are left, you cannot exchange</li>
+                    <li>Exchanging ends your turn with no points scored</li>
+                </ul>
+            </div>
+
+            <div className={styles.section}>
+                <div className={styles.sectionTitle}>Post-Game Stats</div>
+                <p>
+                    After the game ends, a summary appears showing the best word played, total bingos, and number of turns. Use this to review your play and the AI's highlights!
                 </p>
             </div>
 
